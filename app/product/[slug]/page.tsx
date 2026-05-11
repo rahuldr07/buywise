@@ -77,8 +77,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </Link>
         </Button>
 
-        <section className="border-bw-border rounded-[2rem] border bg-white p-5 shadow-[0_12px_36px_rgba(44,37,24,0.08)] md:p-8">
-          <div className="grid gap-8 lg:grid-cols-[1fr_0.92fr] lg:items-start">
+        <section className="border-bw-border rounded-[2rem] border bg-white p-5 shadow-[0_12px_36px_rgba(44,37,24,0.08)] md:p-7">
+          <div className="grid gap-7 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
             <div>
               <div className="flex flex-wrap items-center gap-3">
                 <Badge
@@ -97,11 +97,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 </Badge>
               </div>
 
-              <h1 className="font-display text-bw-ink mt-6 max-w-4xl text-4xl leading-tight font-black md:text-6xl">
+              <h1 className="font-display text-bw-ink mt-5 max-w-4xl text-4xl leading-tight font-black md:text-5xl">
                 {product.name}
               </h1>
 
-              <div className="text-bw-muted mt-5 flex flex-wrap items-center gap-3 text-sm font-bold">
+              <div className="text-bw-muted mt-4 flex flex-wrap items-center gap-3 text-sm font-bold">
                 <span>{product.retailer}</span>
                 <span className="bg-bw-border h-1 w-1 rounded-full" />
                 <span className="flex items-center gap-1.5">
@@ -112,11 +112,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 <span>Updated {product.lastUpdated}</span>
               </div>
 
-              <p className="text-bw-muted mt-7 max-w-3xl text-lg leading-8 font-medium">
+              <p className="text-bw-muted mt-5 max-w-3xl text-base leading-7 font-medium">
                 {product.verdictReason}
               </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Button asChild className="bg-bw-ink h-[3.25rem] rounded-full px-6 text-white">
                   <a href={product.retailerUrl} rel="noreferrer" target="_blank">
                     View retailer
@@ -175,6 +175,36 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   value={`+${formatPrice(priceAboveLow, product.currency)}`}
                 />
                 <MetricCard label="Retail discount" value={discount ? `${discount}%` : "N/A"} />
+              </div>
+
+              <div className="border-bw-border bg-bw-paper rounded-[1.5rem] border p-5">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <p className="text-primary text-sm font-black">Decision summary</p>
+                    <h2 className="font-display text-bw-ink mt-2 text-2xl font-black">
+                      {suggestedAction}
+                    </h2>
+                  </div>
+                  <Badge className="border-bw-border bg-white text-bw-ink rounded-full border px-4 py-2">
+                    {formatPrice(lowestPrice, product.currency)} target low
+                  </Badge>
+                </div>
+                <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                  {product.scores.slice(0, 3).map((score) => (
+                    <div key={score.id}>
+                      <div className="flex items-center justify-between gap-2 text-xs font-black">
+                        <span className="text-bw-muted">{shortMetricLabel(score.label)}</span>
+                        <span className="text-bw-ink">{score.score}</span>
+                      </div>
+                      <div className="bg-bw-border/80 mt-2 h-1.5 overflow-hidden rounded-full">
+                        <div
+                          className="bg-bw-ink h-full rounded-full"
+                          style={{ width: `${score.score}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -386,6 +416,10 @@ function MetricRow({ label, value }: { label: string; value: string }) {
       <span className="font-display text-bw-ink text-right text-lg font-black">{value}</span>
     </div>
   );
+}
+
+function shortMetricLabel(label: string) {
+  return label.replace("Review Trust Score", "Trust").replace(" Score", "");
 }
 
 function InsightList({

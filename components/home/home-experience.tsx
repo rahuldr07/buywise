@@ -44,6 +44,12 @@ const proof = [
   { label: "Reviews scanned", value: "18.4k" },
 ] as const;
 
+const heroInsights = [
+  { label: "Top review source", value: "Amazon + Reddit", tone: "bg-bw-blue-soft" },
+  { label: "Price window", value: "$318 low / $349 high", tone: "bg-bw-amber-soft" },
+  { label: "Next action", value: "Compare Bose Ultra", tone: "bg-bw-green-soft" },
+] as const;
+
 const offerCards = [
   {
     eyebrow: "buy what you",
@@ -275,7 +281,7 @@ export function HomeExperience() {
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 pt-12 pb-12 lg:min-h-[calc(100vh-5rem)] lg:grid-cols-[0.88fr_1.12fr] lg:items-center lg:pt-16">
+      <section className="mx-auto grid max-w-7xl gap-6 px-4 pt-8 pb-10 lg:min-h-[calc(100vh-7rem)] lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:pt-8">
         <div>
           <div
             data-hero-copy
@@ -287,7 +293,7 @@ export function HomeExperience() {
 
           <h1
             data-hero-copy
-            className="font-display text-bw-ink mt-7 max-w-3xl text-5xl leading-[1.02] font-black md:text-6xl xl:text-7xl"
+            className="font-display text-bw-ink mt-6 max-w-2xl text-5xl leading-[1.02] font-black md:text-6xl xl:text-6xl"
           >
             Know what to buy from{" "}
             <span className="bg-bw-green-soft text-bw-green rounded-[1rem] px-2">
@@ -295,12 +301,12 @@ export function HomeExperience() {
             </span>
           </h1>
 
-          <p data-hero-copy className="text-bw-muted mt-6 max-w-xl text-lg leading-8 font-medium">
+          <p data-hero-copy className="text-bw-muted mt-5 max-w-xl text-lg leading-8 font-medium">
             Paste a link or search a product. IsItABuy gives you a clean verdict, explains the
             buying signals, and points out better alternatives before checkout.
           </p>
 
-          <div data-hero-copy className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div data-hero-copy className="mt-7 flex flex-col gap-3 sm:flex-row">
             <button
               className="bg-bw-ink inline-flex h-[3.25rem] items-center justify-center gap-2 rounded-full px-6 text-sm font-black text-white transition hover:-translate-y-0.5"
               type="button"
@@ -318,14 +324,29 @@ export function HomeExperience() {
             </Link>
           </div>
 
-          <div data-hero-copy className="mt-9 grid max-w-xl grid-cols-3 gap-3">
+          <div data-hero-copy className="mt-7 grid max-w-xl grid-cols-3 gap-3">
             {proof.map((item) => (
               <div
                 key={item.label}
-                className="border-bw-border rounded-[1.5rem] border bg-white p-4 shadow-sm"
+                className="border-bw-border rounded-[1.35rem] border bg-white p-4 shadow-sm"
               >
                 <p className="text-bw-muted text-xs font-black">{item.label}</p>
                 <p className="font-display text-bw-ink mt-1 text-2xl font-black">{item.value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div data-hero-copy className="mt-3 grid max-w-xl gap-2">
+            {heroInsights.map((item) => (
+              <div
+                key={item.label}
+                className={cn(
+                  "border-bw-border flex items-center justify-between gap-4 rounded-full border px-4 py-3 shadow-sm",
+                  item.tone
+                )}
+              >
+                <span className="text-bw-muted text-xs font-black">{item.label}</span>
+                <span className="text-bw-ink text-sm font-black">{item.value}</span>
               </div>
             ))}
           </div>
@@ -334,12 +355,12 @@ export function HomeExperience() {
         <div
           ref={heroPanelRef}
           data-hero-panel
-          className="living-panel border-bw-border rounded-[2rem] border bg-white p-4 shadow-[0_20px_70px_rgba(44,37,24,0.1)] md:p-5"
+          className="living-panel border-bw-border rounded-[2rem] border bg-white p-3 shadow-[0_20px_70px_rgba(44,37,24,0.1)] md:p-4"
           onPointerLeave={onPanelPointerLeave}
           onPointerMove={onPanelPointerMove}
         >
-          <div className="relative overflow-hidden rounded-[1.7rem] bg-[linear-gradient(135deg,#fff3cf,#eef6ff_52%,#e8faef)] p-4">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="relative overflow-hidden rounded-[1.7rem] bg-[linear-gradient(135deg,#fff4d9,#f7fbff_52%,#ecfff4)] p-4">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="text-bw-muted flex items-center gap-2 text-sm font-black">
                   <span className="bw-breathe bg-bw-green size-2 rounded-full" />
@@ -393,7 +414,7 @@ export function HomeExperience() {
               </p>
             </div>
 
-            <form action="/search" className="mt-4 grid gap-3 md:grid-cols-[1fr_auto]">
+            <form action="/search" className="mt-3 grid gap-3 md:grid-cols-[1fr_auto]">
               <label className="relative">
                 <Search className="text-bw-muted absolute top-1/2 left-4 size-5 -translate-y-1/2" />
                 <input
@@ -412,7 +433,7 @@ export function HomeExperience() {
               </button>
             </form>
 
-            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+            <div className="mt-3 grid gap-2 sm:grid-cols-3">
               {liveSignals.map((signal, index) => (
                 <button
                   key={signal.label}
@@ -440,9 +461,9 @@ export function HomeExperience() {
               ))}
             </div>
 
-            <div className="mt-5 grid gap-3 md:grid-cols-[1fr_0.78fr]">
-              <div data-soft-card className="border-bw-border rounded-[1.5rem] border bg-white p-5">
-                <div className="border-bw-border bg-bw-fog mb-4 h-36 overflow-hidden rounded-[1.2rem] border">
+            <div className="mt-4 grid gap-3 md:grid-cols-[1fr_0.82fr]">
+              <div data-soft-card className="border-bw-border rounded-[1.5rem] border bg-white p-4">
+                <div className="border-bw-border bg-bw-fog mb-4 h-32 overflow-hidden rounded-[1.2rem] border">
                   <Image
                     alt={demoProduct.name}
                     className="h-full w-full object-cover"
@@ -453,13 +474,13 @@ export function HomeExperience() {
                   />
                 </div>
                 <p className="text-bw-muted text-sm font-black">Demo product</p>
-                <h2 className="font-display text-bw-ink mt-2 text-2xl leading-tight font-black">
+                <h2 className="font-display text-bw-ink mt-2 text-xl leading-tight font-black">
                   {demoProduct.name}
                 </h2>
-                <p className="text-bw-muted mt-4 text-sm leading-6 font-medium">
+                <p className="text-bw-muted mt-3 text-sm leading-6 font-medium">
                   {demoProduct.verdictReason}
                 </p>
-                <div className="bg-bw-fog mt-5 rounded-full px-4 py-3">
+                <div className="bg-bw-fog mt-4 rounded-full px-4 py-3">
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-bw-muted text-sm font-black">Current price</span>
                     <span className="font-display text-bw-ink text-2xl font-black">
@@ -472,21 +493,42 @@ export function HomeExperience() {
               <div className="grid gap-3">
                 <div
                   data-soft-card
-                  className="border-bw-border rounded-[1.5rem] border bg-white p-5"
+                  className="border-bw-border rounded-[1.5rem] border bg-white p-4"
                 >
-                  <div className="text-bw-amber flex items-center gap-2">
-                    <TrendingDown className="size-5" />
-                    <span className="font-black">Wait</span>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-bw-amber flex items-center gap-2">
+                      <TrendingDown className="size-5" />
+                      <span className="font-black">Wait</span>
+                    </div>
+                    <span className="font-display text-bw-ink text-2xl font-black">
+                      {demoProduct.aiBuyScore}
+                    </span>
                   </div>
-                  <p className="text-bw-muted mt-3 text-sm leading-6 font-medium">
+                  <p className="text-bw-muted mt-2 text-sm leading-6 font-medium">
                     Better price timing is likely.
                   </p>
+                  <div className="mt-4 space-y-2">
+                    {demoProduct.scores.slice(0, 3).map((score) => (
+                      <div key={score.id}>
+                        <div className="flex items-center justify-between text-xs font-black">
+                          <span className="text-bw-muted">{shortHeroScore(score.label)}</span>
+                          <span className="text-bw-ink">{score.score}</span>
+                        </div>
+                        <div className="bg-bw-border mt-1 h-1.5 overflow-hidden rounded-full">
+                          <div
+                            className="bg-bw-ink h-full rounded-full"
+                            style={{ width: `${score.score}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 {alternative ? (
                   <div
                     data-soft-card
-                    className="border-bw-green/20 bg-bw-green-soft rounded-[1.5rem] border p-5"
+                    className="border-bw-green/20 bg-bw-green-soft rounded-[1.5rem] border p-4"
                   >
                     <div className="flex items-start gap-3">
                       <BadgeCheck className="text-bw-green mt-0.5 size-5 shrink-0" />
@@ -496,6 +538,12 @@ export function HomeExperience() {
                           {alternative.name} at{" "}
                           {formatPrice(alternative.price, demoProduct.currency)}.
                         </p>
+                        <div className="mt-4 flex items-center justify-between rounded-full bg-white/75 px-3 py-2">
+                          <span className="text-bw-muted text-xs font-black">Alt score</span>
+                          <span className="font-display text-bw-green text-xl font-black">
+                            {alternative.aiBuyScore}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -696,4 +744,8 @@ export function HomeExperience() {
       </footer>
     </main>
   );
+}
+
+function shortHeroScore(label: string) {
+  return label.replace("Review Trust Score", "Trust").replace(" Score", "");
 }
