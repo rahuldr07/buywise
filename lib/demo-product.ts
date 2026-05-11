@@ -71,6 +71,8 @@ export const productCatalog: ProductVerdict[] = [
         id: "alt_bose_qc_ultra",
         name: "Bose QuietComfort Ultra Headphones",
         tag: "Stronger comfort pick",
+        imageUrl:
+          "https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&w=900&q=80",
         aiBuyScore: 84,
         price: 349,
         retailer: "Best Buy",
@@ -306,6 +308,8 @@ export const productCatalog: ProductVerdict[] = [
         id: "alt_asics_novablast",
         name: "ASICS Novablast 4",
         tag: "More energetic daily trainer",
+        imageUrl:
+          "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=900&q=80",
         aiBuyScore: 79,
         price: 109,
         retailer: "Zappos",

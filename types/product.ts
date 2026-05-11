@@ -45,6 +45,7 @@ export interface Alternative {
   id: string;
   name: string;
   tag: string;
+  imageUrl: string;
   aiBuyScore: number;
   price: number;
   retailer: string;

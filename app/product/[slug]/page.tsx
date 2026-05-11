@@ -286,9 +286,20 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 <Badge className="border-bw-green/20 bg-bw-green-soft text-bw-green rounded-full border px-4 py-2">
                   Better alternative found
                 </Badge>
-                <h2 className="font-display text-bw-ink mt-4 text-3xl font-black">
-                  {alternative.name}
-                </h2>
+                <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
+                  <div className="border-bw-border h-28 w-36 overflow-hidden rounded-[1.35rem] border bg-bw-fog">
+                    <Image
+                      alt={alternative.name}
+                      className="h-full w-full object-cover"
+                      height={224}
+                      src={alternative.imageUrl}
+                      width={288}
+                    />
+                  </div>
+                  <h2 className="font-display text-bw-ink text-3xl font-black">
+                    {alternative.name}
+                  </h2>
+                </div>
                 <p className="text-bw-muted mt-3 max-w-3xl text-base leading-8 font-medium">
                   {alternative.tag} at {formatPrice(alternative.price, product.currency)} from{" "}
                   {alternative.retailer}. This option currently scores higher and has a stronger

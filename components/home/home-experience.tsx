@@ -376,72 +376,96 @@ export function HomeExperience() {
 
       <section className="mx-auto grid max-w-7xl items-stretch gap-6 px-4 pt-8 pb-10 lg:min-h-[calc(100vh-7rem)] lg:grid-cols-[0.92fr_1.08fr] lg:pt-8">
         <div className="flex h-full flex-col items-start">
+          <div>
+            <div
+              data-hero-copy
+              className="border-bw-border text-bw-muted inline-flex items-center gap-2 rounded-full border bg-white px-4 py-2 text-sm font-black shadow-sm"
+            >
+              <ShieldCheck className="text-bw-green size-4" />
+              Product checks stay free to start
+            </div>
+
+            <h1
+              data-hero-copy
+              className="font-display text-bw-ink mt-6 max-w-2xl text-5xl leading-[1.02] font-black md:text-6xl xl:text-6xl"
+            >
+              Know what to buy from{" "}
+              <span className="bg-bw-green-soft text-bw-green rounded-[1rem] px-2">
+                one product link.
+              </span>
+            </h1>
+
+            <p data-hero-copy className="text-bw-muted mt-5 max-w-xl text-lg leading-8 font-medium">
+              Paste a link or search a product. IsItABuy gives you a clean verdict, explains the
+              buying signals, and points out better alternatives before checkout.
+            </p>
+
+            <div data-hero-copy className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <button
+                className="bg-bw-ink inline-flex h-[3.25rem] items-center justify-center gap-2 rounded-full px-6 text-sm font-black text-white transition hover:-translate-y-0.5"
+                type="button"
+                onClick={() => scrollTo("#checker")}
+              >
+                Start checking
+                <ArrowRight className="size-4" />
+              </button>
+              <Link
+                className="border-bw-border text-bw-ink inline-flex h-[3.25rem] items-center justify-center gap-2 rounded-full border bg-white px-6 text-sm font-black shadow-sm transition hover:-translate-y-0.5"
+                href={`/product/${matchedProduct.slug}`}
+              >
+                View report
+                <Star className="text-bw-amber size-4 fill-current" />
+              </Link>
+            </div>
+
+            <div data-hero-copy className="mt-7 grid w-full max-w-xl grid-cols-3 gap-3">
+              {proof.map((item) => (
+                <div
+                  key={item.label}
+                  className="border-bw-border rounded-[1.35rem] border bg-white p-4 shadow-sm"
+                >
+                  <p className="text-bw-muted text-xs font-black">{item.label}</p>
+                  <p className="font-display text-bw-ink mt-1 text-2xl font-black">{item.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div
             data-hero-copy
-            className="border-bw-border text-bw-muted inline-flex items-center gap-2 rounded-full border bg-white px-4 py-2 text-sm font-black shadow-sm"
+            className="border-bw-border mt-4 flex w-full max-w-xl flex-1 flex-col justify-end rounded-[1.7rem] border bg-white/72 p-3 shadow-sm backdrop-blur"
           >
-            <ShieldCheck className="text-bw-green size-4" />
-            Product checks stay free to start
-          </div>
+            <div className="grid gap-2">
+              {heroInsights.map((item) => (
+                <div
+                  key={item.label}
+                  className={cn(
+                    "border-bw-border flex items-center justify-between gap-4 rounded-full border px-4 py-3 shadow-sm",
+                    item.tone
+                  )}
+                >
+                  <span className="text-bw-muted text-xs font-black">{item.label}</span>
+                  <span className="text-bw-ink text-sm font-black">{item.value}</span>
+                </div>
+              ))}
+            </div>
 
-          <h1
-            data-hero-copy
-            className="font-display text-bw-ink mt-6 max-w-2xl text-5xl leading-[1.02] font-black md:text-6xl xl:text-6xl"
-          >
-            Know what to buy from{" "}
-            <span className="bg-bw-green-soft text-bw-green rounded-[1rem] px-2">
-              one product link.
-            </span>
-          </h1>
-
-          <p data-hero-copy className="text-bw-muted mt-5 max-w-xl text-lg leading-8 font-medium">
-            Paste a link or search a product. IsItABuy gives you a clean verdict, explains the
-            buying signals, and points out better alternatives before checkout.
-          </p>
-
-          <div data-hero-copy className="mt-7 flex flex-col gap-3 sm:flex-row">
-            <button
-              className="bg-bw-ink inline-flex h-[3.25rem] items-center justify-center gap-2 rounded-full px-6 text-sm font-black text-white transition hover:-translate-y-0.5"
-              type="button"
-              onClick={() => scrollTo("#checker")}
-            >
-              Start checking
-              <ArrowRight className="size-4" />
-            </button>
-            <Link
-              className="border-bw-border text-bw-ink inline-flex h-[3.25rem] items-center justify-center gap-2 rounded-full border bg-white px-6 text-sm font-black shadow-sm transition hover:-translate-y-0.5"
-              href={`/product/${matchedProduct.slug}`}
-            >
-              View report
-              <Star className="text-bw-amber size-4 fill-current" />
-            </Link>
-          </div>
-
-          <div data-hero-copy className="mt-7 grid w-full max-w-xl grid-cols-3 gap-3">
-            {proof.map((item) => (
-              <div
-                key={item.label}
-                className="border-bw-border rounded-[1.35rem] border bg-white p-4 shadow-sm"
-              >
-                <p className="text-bw-muted text-xs font-black">{item.label}</p>
-                <p className="font-display text-bw-ink mt-1 text-2xl font-black">{item.value}</p>
+            <div className="border-bw-border bg-bw-paper mt-3 grid gap-3 rounded-[1.35rem] border p-3 sm:grid-cols-[1fr_auto] sm:items-center">
+              <div>
+                <p className="text-bw-muted text-xs font-black">Current match</p>
+                <p className="text-bw-ink mt-1 line-clamp-2 text-sm leading-5 font-black">
+                  {matchedProduct.name}
+                </p>
               </div>
-            ))}
-          </div>
-
-          <div data-hero-copy className="mt-3 grid w-full max-w-xl gap-2">
-            {heroInsights.map((item) => (
-              <div
-                key={item.label}
-                className={cn(
-                  "border-bw-border flex items-center justify-between gap-4 rounded-full border px-4 py-3 shadow-sm",
-                  item.tone
-                )}
-              >
-                <span className="text-bw-muted text-xs font-black">{item.label}</span>
-                <span className="text-bw-ink text-sm font-black">{item.value}</span>
+              <div className="flex items-center gap-2 sm:justify-end">
+                <span className={cn("rounded-full px-3 py-1 text-xs font-black", verdict.soft)}>
+                  {matchedProduct.verdict}
+                </span>
+                <span className="font-display text-bw-ink text-2xl font-black">
+                  {matchedProduct.aiBuyScore}
+                </span>
               </div>
-            ))}
+            </div>
           </div>
         </div>
 
@@ -578,7 +602,7 @@ export function HomeExperience() {
             <div className="mt-4 grid flex-1 auto-rows-[minmax(5rem,auto)] gap-3 md:grid-cols-6">
               <Link
                 data-soft-card
-                className="border-bw-border group relative overflow-hidden rounded-[1.5rem] border bg-white p-3 md:col-span-4 md:row-span-2"
+                className="border-bw-border group relative overflow-hidden rounded-[1.5rem] border bg-white p-3 md:col-span-3 md:row-span-3"
                 href={`/product/${matchedProduct.slug}`}
               >
                 <div className="relative h-48 overflow-hidden rounded-[1.15rem] bg-bw-fog md:h-full">
@@ -603,21 +627,34 @@ export function HomeExperience() {
 
               <div
                 data-soft-card
-                className="border-bw-border rounded-[1.5rem] border bg-white p-4 md:col-span-2"
+                className="border-bw-border rounded-[1.5rem] border bg-white p-4 md:col-span-3"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-bw-muted text-xs font-black">AI score</p>
-                    <p className="font-display text-bw-ink mt-1 text-4xl font-black">
-                      {matchedProduct.aiBuyScore}
+                    <div className="mt-1 flex flex-wrap items-end gap-3">
+                      <p className="font-display text-bw-ink text-4xl font-black">
+                        {matchedProduct.aiBuyScore}
+                      </p>
+                      <p className="font-display text-bw-ink text-2xl font-black">
+                        {formatPrice(matchedProduct.currentPrice, matchedProduct.currency)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="border-bw-border h-16 w-20 overflow-hidden rounded-[1rem] border bg-bw-fog">
+                      <Image
+                        alt={alternative?.name ?? matchedProduct.name}
+                        className="h-full w-full object-cover"
+                        height={128}
+                        src={alternative?.imageUrl ?? matchedProduct.imageUrl}
+                        width={160}
+                      />
+                    </div>
+                    <p className="text-bw-muted mt-1 text-[0.68rem] font-black">
+                      {alternative ? "ALT PICK" : "TOP PICK"}
                     </p>
                   </div>
-                  <div
-                    className="size-14 rounded-full border border-white shadow-inner"
-                    style={{
-                      background: `conic-gradient(#182019 ${matchedProduct.aiBuyScore * 3.6}deg, #eadfc8 0deg)`,
-                    }}
-                  />
                 </div>
                 <span className={cn("mt-4 inline-flex rounded-full px-3 py-1 text-xs font-black", verdict.soft)}>
                   {matchedProduct.verdict}
@@ -626,12 +663,45 @@ export function HomeExperience() {
 
               <div
                 data-soft-card
-                className="border-bw-border bg-bw-fog rounded-[1.5rem] border p-4 md:col-span-2"
+                className={cn(
+                  "overflow-hidden rounded-[1.5rem] border p-3 md:col-span-3",
+                  alternative
+                    ? "border-bw-green/20 bg-bw-green-soft"
+                    : "border-bw-border bg-white"
+                )}
               >
-                <p className="text-bw-muted text-xs font-black">Current price</p>
-                <p className="font-display text-bw-ink mt-1 text-3xl font-black">
-                  {formatPrice(matchedProduct.currentPrice, matchedProduct.currency)}
-                </p>
+                <div className="flex h-full items-stretch gap-3">
+                  <div className="border-bw-border relative h-auto min-h-28 w-28 shrink-0 overflow-hidden rounded-[1.1rem] border bg-white">
+                    <Image
+                      alt={alternative?.name ?? matchedProduct.name}
+                      className="h-full w-full object-cover"
+                      height={220}
+                      src={alternative?.imageUrl ?? matchedProduct.imageUrl}
+                      width={220}
+                    />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <BadgeCheck className="text-bw-green size-5 shrink-0" />
+                      <p className="text-bw-ink font-black">
+                        {alternative ? "Alternative found" : "No better alternative"}
+                      </p>
+                    </div>
+                    <p className="text-bw-muted mt-1 text-sm leading-6 font-medium">
+                      {alternative
+                        ? `${alternative.name} at ${formatPrice(alternative.price, matchedProduct.currency)}.`
+                        : "Current product is the best demo match for this search."}
+                    </p>
+                    {alternative ? (
+                      <div className="mt-3 flex items-center justify-between gap-3 rounded-full bg-white/75 px-3 py-2">
+                        <span className="text-bw-muted text-xs font-black">Alt score</span>
+                        <span className="font-display text-bw-green text-xl font-black">
+                          {alternative.aiBuyScore}
+                        </span>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
                 <p className="text-bw-muted mt-2 text-xs font-bold">
                   {matchedProduct.retailer} · {matchedProduct.category}
                 </p>
@@ -672,25 +742,19 @@ export function HomeExperience() {
 
               <div
                 data-soft-card
-                className={cn(
-                  "rounded-[1.5rem] border p-4 md:col-span-3",
-                  alternative
-                    ? "border-bw-green/20 bg-bw-green-soft"
-                    : "border-bw-border bg-white"
-                )}
+                className="border-bw-border bg-bw-fog rounded-[1.5rem] border p-4 md:col-span-3"
               >
-                <div className="flex items-start gap-3">
-                  <BadgeCheck className="text-bw-green mt-0.5 size-5 shrink-0" />
+                <div className="flex h-full items-center justify-between gap-4">
                   <div>
-                    <p className="text-bw-ink font-black">
-                      {alternative ? "Alternative found" : "No better alternative"}
-                    </p>
-                    <p className="text-bw-muted mt-1 text-sm leading-6 font-medium">
-                      {alternative
-                        ? `${alternative.name} at ${formatPrice(alternative.price, matchedProduct.currency)}.`
-                        : "Current product is the best demo match for this search."}
+                    <p className="text-bw-muted text-xs font-black">Retail context</p>
+                    <p className="text-bw-ink mt-1 font-black">{matchedProduct.retailer}</p>
+                    <p className="text-bw-muted mt-1 text-sm font-medium">
+                      {matchedProduct.category}
                     </p>
                   </div>
+                  <p className="font-display text-bw-ink text-3xl font-black">
+                    {formatPrice(matchedProduct.currentPrice, matchedProduct.currency)}
+                  </p>
                 </div>
               </div>
             </div>
