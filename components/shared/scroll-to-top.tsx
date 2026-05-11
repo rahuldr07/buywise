@@ -21,7 +21,7 @@ export function ScrollToTop() {
     <Button
       aria-label="Scroll to top"
       className={cn(
-        "text-bw-ink fixed right-6 bottom-6 z-50 size-12 rounded-2xl border border-white/85 bg-white/78 shadow-[0_16px_50px_rgba(44,37,24,0.14)] backdrop-blur transition-all hover:bg-white",
+        "text-bw-ink border-bw-border hover:bg-bw-fog fixed right-6 bottom-6 z-50 size-12 rounded-2xl border bg-white shadow-[0_10px_30px_rgba(44,37,24,0.12)] transition-all",
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
       )}
       size="icon"

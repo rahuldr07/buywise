@@ -14,14 +14,13 @@ export function LenisProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.18,
-      lerp: 0.09,
+      duration: 0.72,
+      lerp: 0.13,
       smoothWheel: true,
-      wheelMultiplier: 0.9,
-      touchMultiplier: 1.1,
+      wheelMultiplier: 1,
+      touchMultiplier: 1,
       prevent: (node) =>
-        node.hasAttribute("data-lenis-prevent") ||
-        node.classList.contains("lenis-prevent"),
+        node.hasAttribute("data-lenis-prevent") || node.classList.contains("lenis-prevent"),
     });
 
     const win = window as BuyWiseWindow;
@@ -54,7 +53,7 @@ export function useLenisScroll() {
     const lenis = (window as BuyWiseWindow).__buywiseLenis;
 
     if (lenis) {
-      lenis.scrollTo(target, { duration: 1.18 });
+      lenis.scrollTo(target, { duration: 0.72 });
       return;
     }
 

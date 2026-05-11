@@ -30,7 +30,7 @@ export function StagedRouteShell({
     <main className="mx-auto flex min-h-screen w-full max-w-6xl items-center px-4 py-16">
       <section className="premium-shell premium-noise grid w-full gap-8 rounded-[2.75rem] border border-white/85 p-4 shadow-[0_34px_120px_rgba(44,37,24,0.12)] md:p-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div>
-          <Badge className="text-primary rounded-2xl border border-white/80 bg-white/76 px-4 py-2 shadow-sm backdrop-blur">
+          <Badge className="text-primary rounded-2xl border border-white/80 bg-white px-4 py-2 shadow-sm">
             {eyebrow}
           </Badge>
           <h1 className="font-display text-bw-ink mt-6 max-w-3xl text-4xl leading-tight font-black md:text-6xl">
@@ -50,7 +50,7 @@ export function StagedRouteShell({
             </Link>
             <Link
               href={secondaryHref}
-              className="text-bw-ink inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-white/80 bg-white/76 px-5 text-sm font-black shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white"
+              className="text-bw-ink hover:bg-bw-fog inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-white/80 bg-white px-5 text-sm font-black shadow-sm transition hover:-translate-y-0.5"
             >
               <ArrowLeft className="size-4" />
               {secondaryLabel}
@@ -60,7 +60,7 @@ export function StagedRouteShell({
           {note ? <p className="text-bw-muted mt-5 text-sm leading-6 font-medium">{note}</p> : null}
         </div>
 
-        <div className="rounded-[2rem] border border-white/80 bg-white/72 p-5 shadow-[0_18px_70px_rgba(44,37,24,0.08)] backdrop-blur md:p-6">
+        <div className="rounded-[2rem] border border-white/80 bg-white p-5 shadow-[0_12px_36px_rgba(44,37,24,0.08)] md:p-6">
           {children}
         </div>
       </section>

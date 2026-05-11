@@ -54,7 +54,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <div className="mx-auto max-w-7xl">
         <Button
           asChild
-          className="text-bw-ink mb-5 h-12 rounded-2xl border border-white/80 bg-white/76 px-5 shadow-sm backdrop-blur hover:bg-white"
+          className="text-bw-ink border-bw-border hover:bg-bw-fog mb-5 h-12 rounded-2xl border bg-white px-5 shadow-sm"
           variant="ghost"
         >
           <Link href="/">
@@ -64,11 +64,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         </Button>
 
         <section className="premium-shell premium-noise rounded-[2.75rem] border border-white/85 p-3 shadow-[0_34px_120px_rgba(44,37,24,0.12)] md:p-5">
-          <div className="grid gap-5 rounded-[2.25rem] border border-white/80 bg-white/70 p-4 backdrop-blur-xl md:p-6 lg:grid-cols-[0.82fr_1.18fr]">
+          <div className="grid gap-5 rounded-[2.25rem] border border-white/80 bg-white p-4 md:p-6 lg:grid-cols-[0.82fr_1.18fr]">
             <div className="rounded-[2rem] border border-white/85 bg-white/76 p-4 shadow-[0_18px_70px_rgba(44,37,24,0.09)]">
               <div className="border-bw-border relative flex aspect-square items-center justify-center overflow-hidden rounded-[1.75rem] border bg-[linear-gradient(145deg,#fff6da,#eef6ff_54%,#e9fbf2)]">
                 <div className="premium-orb absolute -top-14 -right-14 size-52 rounded-full opacity-70" />
-                <div className="bg-bw-coral/18 absolute bottom-10 left-10 size-28 rounded-full blur-2xl" />
+                <div className="bg-bw-coral/18 absolute bottom-10 left-10 size-28 rounded-full" />
                 <div className="relative flex size-72 items-center justify-center">
                   <div className="border-bw-ink absolute h-56 w-56 rounded-full border-[20px] shadow-[0_24px_80px_rgba(24,32,25,0.18)]" />
                   <div className="absolute h-36 w-36 rounded-full border-[18px] border-white/90 bg-white/40" />
@@ -230,7 +230,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         </section>
 
         <section className="mt-5 grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-[2.25rem] border border-white/85 bg-white/78 p-6 shadow-[0_18px_70px_rgba(44,37,24,0.08)] backdrop-blur md:p-8">
+          <div className="border-bw-border rounded-[2.25rem] border bg-white p-6 shadow-[0_12px_36px_rgba(44,37,24,0.08)] md:p-8">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-primary text-sm font-black">Score breakdown</p>
@@ -268,7 +268,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
 
-          <div className="rounded-[2.25rem] border border-white/85 bg-white/78 p-6 shadow-[0_18px_70px_rgba(44,37,24,0.08)] backdrop-blur md:p-8">
+          <div className="border-bw-border rounded-[2.25rem] border bg-white p-6 shadow-[0_12px_36px_rgba(44,37,24,0.08)] md:p-8">
             <p className="text-bw-green text-sm font-black">Buyer read</p>
             <h2 className="font-display text-bw-ink mt-2 text-3xl font-black">
               Pros and cons without the noise
@@ -366,7 +366,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         ) : null}
 
         <section className="mt-5 grid gap-5 lg:grid-cols-2">
-          <div className="rounded-[2.25rem] border border-white/85 bg-white/78 p-6 shadow-[0_18px_70px_rgba(44,37,24,0.08)] backdrop-blur md:p-8">
+          <div className="border-bw-border rounded-[2.25rem] border bg-white p-6 shadow-[0_12px_36px_rgba(44,37,24,0.08)] md:p-8">
             <div className="text-bw-amber flex items-center gap-2">
               <TrendingDown className="size-5" />
               <p className="font-black">Price history preview</p>
@@ -393,7 +393,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
 
-          <div className="rounded-[2.25rem] border border-white/85 bg-white/78 p-6 shadow-[0_18px_70px_rgba(44,37,24,0.08)] backdrop-blur md:p-8">
+          <div className="border-bw-border rounded-[2.25rem] border bg-white p-6 shadow-[0_12px_36px_rgba(44,37,24,0.08)] md:p-8">
             <p className="text-primary text-sm font-black">Sources and evidence</p>
             <h2 className="font-display text-bw-ink mt-3 text-3xl font-black">
               Trust comes from visible source categories

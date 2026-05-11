@@ -53,7 +53,7 @@ export function PriceAlertDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button className="border-bw-border text-bw-ink h-[3.25rem] rounded-2xl border bg-white/82 px-5 shadow-sm backdrop-blur hover:bg-white">
+          <Button className="border-bw-border text-bw-ink hover:bg-bw-fog h-[3.25rem] rounded-2xl border bg-white px-5 shadow-sm">
             <Bell className="mr-2 size-4" />
             Track price
           </Button>

@@ -32,15 +32,13 @@
   --bw-coral-soft: #fff0ea;
 
   --bw-gradient-hero:
-    radial-gradient(circle at 18% 18%, #fff6cf 0 22%, transparent 44%),
-    radial-gradient(circle at 88% 12%, #dbe8ff 0 18%, transparent 39%),
-    radial-gradient(circle at 76% 82%, #d9f8e7 0 20%, transparent 46%),
-    linear-gradient(135deg, #fff7e5 0%, #ffffff 44%, #eef7ff 100%);
+    radial-gradient(circle at 18% 16%, rgba(255, 226, 142, 0.68), transparent 26rem),
+    linear-gradient(135deg, #fff7e5 0%, #ffffff 54%, #eef7ff 100%);
   --bw-gradient-card: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(255, 247, 232, 0.82));
   --bw-gradient-primary: linear-gradient(135deg, #182019 0%, #1f5ad7 48%, #23a866 100%);
   --bw-gradient-warm: linear-gradient(135deg, #fff4d8 0%, #ffe7dc 46%, #edf4ff 100%);
-  --bw-shadow-soft: 0 24px 80px rgba(44, 37, 24, 0.1);
-  --bw-shadow-strong: 0 36px 120px rgba(40, 103, 232, 0.16);
+  --bw-shadow-soft: 0 12px 36px rgba(44, 37, 24, 0.08);
+  --bw-shadow-strong: 0 18px 60px rgba(40, 103, 232, 0.1);
 
   --background: var(--bw-paper);
   --foreground: var(--bw-ink);
@@ -185,18 +183,14 @@ html {
 body {
   min-height: 100vh;
   background:
-    radial-gradient(circle at 10% 5%, rgba(255, 221, 138, 0.42), transparent 30rem),
-    radial-gradient(circle at 86% 14%, rgba(40, 103, 232, 0.16), transparent 24rem),
-    radial-gradient(circle at 74% 72%, rgba(35, 168, 102, 0.18), transparent 26rem),
     linear-gradient(rgba(24, 32, 25, 0.034) 1px, transparent 1px),
     linear-gradient(90deg, rgba(24, 32, 25, 0.034) 1px, transparent 1px),
-    linear-gradient(180deg, #fffaf0 0%, #fffdf8 48%, #edf8ff 100%);
+    radial-gradient(circle at 8% 0%, rgba(255, 221, 138, 0.32), transparent 26rem),
+    linear-gradient(180deg, #fffaf0 0%, #fffdf8 58%, #edf8ff 100%);
   background-size:
-    auto,
-    auto,
-    auto,
     64px 64px,
     64px 64px,
+    auto,
     auto;
   color: var(--foreground);
   font-family: "DM Sans Variable", system-ui, sans-serif;
@@ -242,9 +236,8 @@ html.lenis body {
 }
 
 .premium-glass {
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.9);
   box-shadow: var(--bw-shadow-soft);
-  backdrop-filter: blur(24px);
 }
 
 .premium-noise {
@@ -257,13 +250,11 @@ html.lenis body {
   inset: 0;
   pointer-events: none;
   content: "";
-  background:
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.66) 0 1px, transparent 1px),
-    radial-gradient(circle at 80% 40%, rgba(24, 32, 25, 0.08) 0 1px, transparent 1px);
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.58) 0 1px, transparent 1px);
   background-size:
-    18px 18px,
+    22px 22px,
     22px 22px;
-  opacity: 0.34;
+  opacity: 0.22;
 }
 
 .premium-orb {
