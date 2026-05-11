@@ -617,13 +617,13 @@ export function HomeExperience() {
               ))}
             </div>
 
-            <div className="mt-4 grid flex-1 auto-rows-[minmax(4.25rem,auto)] gap-3 md:grid-cols-6">
+            <div className="mt-4 grid gap-3 md:grid-cols-[1fr_0.92fr] md:items-start">
               <Link
                 data-soft-card
-                className="border-bw-border group relative overflow-hidden rounded-[1.5rem] border bg-white p-3 md:col-span-3 md:row-span-2"
+                className="border-bw-border group relative overflow-hidden rounded-[1.5rem] border bg-white p-3"
                 href={`/product/${matchedProduct.slug}`}
               >
-                <div className="relative h-48 overflow-hidden rounded-[1.15rem] bg-bw-fog md:h-full md:min-h-72">
+                <div className="relative h-56 overflow-hidden rounded-[1.15rem] bg-bw-fog md:h-[22rem]">
                   <Image
                     alt={matchedProduct.name}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
@@ -643,115 +643,97 @@ export function HomeExperience() {
                 </div>
               </Link>
 
-              <div
-                data-soft-card
-                className="border-bw-border rounded-[1.5rem] border bg-white p-4 md:col-span-3"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-bw-muted text-xs font-black">AI score</p>
-                    <div className="mt-1 flex flex-wrap items-end gap-3">
-                      <p className="font-display text-bw-ink text-4xl font-black">
-                        {matchedProduct.aiBuyScore}
-                      </p>
-                      <p className="font-display text-bw-ink text-2xl font-black">
-                        {formatPrice(matchedProduct.currentPrice, matchedProduct.currency)}
-                      </p>
+              <div className="grid gap-3 self-start">
+                <div data-soft-card className="border-bw-border rounded-[1.5rem] border bg-white p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-bw-muted text-xs font-black">AI score</p>
+                      <div className="mt-1 flex flex-wrap items-end gap-3">
+                        <p className="font-display text-bw-ink text-4xl font-black">
+                          {matchedProduct.aiBuyScore}
+                        </p>
+                        <p className="font-display text-bw-ink text-2xl font-black">
+                          {formatPrice(matchedProduct.currentPrice, matchedProduct.currency)}
+                        </p>
+                      </div>
                     </div>
+                    <span className={cn("inline-flex rounded-full px-3 py-1 text-xs font-black", verdict.soft)}>
+                      {matchedProduct.verdict}
+                    </span>
                   </div>
-                  <div className="text-right">
-                    <div className="border-bw-border h-16 w-20 overflow-hidden rounded-[1rem] border bg-bw-fog">
+                </div>
+
+                <div
+                  data-soft-card
+                  className={cn(
+                    "overflow-hidden rounded-[1.5rem] border p-3",
+                    alternative
+                      ? "border-bw-green/20 bg-bw-green-soft"
+                      : "border-bw-border bg-white"
+                  )}
+                >
+                  <div className="flex items-stretch gap-3">
+                    <div className="border-bw-border relative h-24 w-24 shrink-0 overflow-hidden rounded-[1rem] border bg-white">
                       <Image
                         alt={alternative?.name ?? matchedProduct.name}
                         className="h-full w-full object-cover"
-                        height={128}
+                        height={220}
                         src={alternative?.imageUrl ?? matchedProduct.imageUrl}
-                        width={160}
+                        width={220}
                       />
                     </div>
-                    <p className="text-bw-muted mt-1 text-[0.68rem] font-black">
-                      {alternative ? "ALT PICK" : "TOP PICK"}
-                    </p>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <BadgeCheck className="text-bw-green size-5 shrink-0" />
+                        <p className="text-bw-ink font-black">
+                          {alternative ? "Alternative found" : "No better alternative"}
+                        </p>
+                      </div>
+                      <p className="text-bw-muted mt-1 text-sm leading-5 font-medium">
+                        {alternative
+                          ? `${alternative.name} at ${formatPrice(alternative.price, matchedProduct.currency)}.`
+                          : "Current product is the best demo match for this search."}
+                      </p>
+                      {alternative ? (
+                        <div className="mt-2 flex items-center justify-between gap-3 rounded-full bg-white/75 px-3 py-1.5">
+                          <span className="text-bw-muted text-xs font-black">Alt score</span>
+                          <span className="font-display text-bw-green text-lg font-black">
+                            {alternative.aiBuyScore}
+                          </span>
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
-                <span className={cn("mt-4 inline-flex rounded-full px-3 py-1 text-xs font-black", verdict.soft)}>
-                  {matchedProduct.verdict}
-                </span>
-              </div>
 
-              <div
-                data-soft-card
-                className={cn(
-                  "overflow-hidden rounded-[1.5rem] border p-3 md:col-span-3",
-                  alternative
-                    ? "border-bw-green/20 bg-bw-green-soft"
-                    : "border-bw-border bg-white"
-                )}
-              >
-                <div className="flex h-full items-stretch gap-3">
-                  <div className="border-bw-border relative h-auto min-h-20 w-20 shrink-0 overflow-hidden rounded-[1rem] border bg-white">
-                    <Image
-                      alt={alternative?.name ?? matchedProduct.name}
-                      className="h-full w-full object-cover"
-                      height={220}
-                      src={alternative?.imageUrl ?? matchedProduct.imageUrl}
-                      width={220}
-                    />
-                  </div>
-                  <div>
+                <div data-soft-card className="border-bw-border rounded-[1.5rem] border bg-white p-3">
+                  <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
-                      <BadgeCheck className="text-bw-green size-5 shrink-0" />
-                      <p className="text-bw-ink font-black">
-                        {alternative ? "Alternative found" : "No better alternative"}
-                      </p>
+                      <TrendingDown className="text-bw-amber size-5" />
+                      <p className="text-bw-ink font-black">{matchedProduct.verdict}</p>
                     </div>
-                    <p className="text-bw-muted mt-1 text-sm leading-5 font-medium">
-                      {alternative
-                        ? `${alternative.name} at ${formatPrice(alternative.price, matchedProduct.currency)}.`
-                        : "Current product is the best demo match for this search."}
-                    </p>
-                    {alternative ? (
-                      <div className="mt-3 flex items-center justify-between gap-3 rounded-full bg-white/75 px-3 py-2">
-                        <span className="text-bw-muted text-xs font-black">Alt score</span>
-                        <span className="font-display text-bw-green text-xl font-black">
-                          {alternative.aiBuyScore}
-                        </span>
-                      </div>
-                    ) : null}
+                    <span className="text-bw-muted text-xs font-black">
+                      {matchedProduct.confidenceScore}% confidence
+                    </span>
                   </div>
-                </div>
-              </div>
-
-              <div
-                data-soft-card
-                className="border-bw-border rounded-[1.5rem] border bg-white p-3 md:col-span-3"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <TrendingDown className="text-bw-amber size-5" />
-                    <p className="text-bw-ink font-black">{matchedProduct.verdict}</p>
-                  </div>
-                  <span className="text-bw-muted text-xs font-black">
-                    {matchedProduct.confidenceScore}% confidence
-                  </span>
-                </div>
-                <div className="mt-3 grid grid-cols-3 gap-2">
-                  {matchedProduct.scores.slice(0, 3).map((score) => (
-                    <div key={score.id} className="rounded-[1rem] bg-bw-paper p-2.5">
-                      <p className="text-bw-muted text-xs font-black">
-                        {shortHeroScore(score.label)}
-                      </p>
-                      <p className="font-display text-bw-ink mt-1 text-xl font-black">
-                        {score.score}
-                      </p>
-                      <div className="bg-bw-border mt-2 h-1 overflow-hidden rounded-full">
-                        <div
-                          className="bg-bw-green h-full rounded-full"
-                          style={{ width: `${score.score}%` }}
-                        />
+                  <div className="mt-3 grid grid-cols-3 gap-2">
+                    {matchedProduct.scores.slice(0, 3).map((score) => (
+                      <div key={score.id} className="rounded-[1rem] bg-bw-paper p-2.5">
+                        <p className="text-bw-muted text-xs font-black">
+                          {shortHeroScore(score.label)}
+                        </p>
+                        <p className="font-display text-bw-ink mt-1 text-xl font-black">
+                          {score.score}
+                        </p>
+                        <div className="bg-bw-border mt-2 h-1 overflow-hidden rounded-full">
+                          <div
+                            className="bg-bw-green h-full rounded-full"
+                            style={{ width: `${score.score}%` }}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
 
