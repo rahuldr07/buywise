@@ -60,13 +60,6 @@ const offerCards = [
   },
 ] as const;
 
-const modeStories = {
-  Link: "Reading retailer price, title, availability, and trust signals.",
-  Search: "Matching products across stores before ranking the cleanest option.",
-  Barcode: "Turning shelf scans into price history and review checks.",
-  Image: "Using visual clues to identify the product before scoring it.",
-} satisfies Record<(typeof inputModes)[number]["label"], string>;
-
 const steps = [
   {
     icon: Search,
@@ -433,7 +426,7 @@ export function HomeExperience() {
 
           <div
             data-hero-copy
-            className="border-bw-border mt-4 flex w-full max-w-xl flex-1 flex-col justify-end rounded-[1.7rem] border bg-white/72 p-3 shadow-sm backdrop-blur"
+            className="border-bw-border mt-4 w-full max-w-xl rounded-[1.7rem] border bg-white/72 p-3 shadow-sm backdrop-blur"
           >
             <div className="grid gap-2">
               {heroInsights.map((item) => (
@@ -450,20 +443,29 @@ export function HomeExperience() {
               ))}
             </div>
 
-            <div className="border-bw-border bg-bw-paper mt-3 grid gap-3 rounded-[1.35rem] border p-3 sm:grid-cols-[1fr_auto] sm:items-center">
-              <div>
-                <p className="text-bw-muted text-xs font-black">Current match</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-[8rem_1fr]">
+              <div className="border-bw-border h-28 overflow-hidden rounded-[1.25rem] border bg-bw-fog">
+                <Image
+                  alt={matchedProduct.name}
+                  className="h-full w-full object-cover"
+                  height={224}
+                  src={matchedProduct.imageUrl}
+                  width={256}
+                />
+              </div>
+              <div className="border-bw-border bg-bw-paper rounded-[1.25rem] border p-3">
+                <p className="text-bw-muted text-xs font-black">Best fuzzy match</p>
                 <p className="text-bw-ink mt-1 line-clamp-2 text-sm leading-5 font-black">
                   {matchedProduct.name}
                 </p>
-              </div>
-              <div className="flex items-center gap-2 sm:justify-end">
-                <span className={cn("rounded-full px-3 py-1 text-xs font-black", verdict.soft)}>
-                  {matchedProduct.verdict}
-                </span>
-                <span className="font-display text-bw-ink text-2xl font-black">
-                  {matchedProduct.aiBuyScore}
-                </span>
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <span className={cn("rounded-full px-3 py-1 text-xs font-black", verdict.soft)}>
+                    {matchedProduct.verdict}
+                  </span>
+                  <span className="font-display text-bw-ink text-2xl font-black">
+                    {matchedProduct.aiBuyScore}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -519,16 +521,6 @@ export function HomeExperience() {
                   </motion.button>
                 );
               })}
-            </div>
-
-            <div className="mt-3 rounded-[1.25rem] border border-white/80 bg-white/72 px-4 py-3">
-              <div className="flex items-center gap-2">
-                <span className="bw-breathe bg-bw-green size-2 rounded-full" />
-                <p className="text-bw-ink text-sm font-black">{selectedMode} mode is awake</p>
-              </div>
-              <p className="text-bw-muted mt-1 text-sm leading-6 font-medium">
-                {modeStories[selectedMode]}
-              </p>
             </div>
 
             <form className="mt-3 grid gap-3 md:grid-cols-[1fr_auto]" onSubmit={onHeroSearch}>
@@ -740,23 +732,6 @@ export function HomeExperience() {
                 </div>
               </div>
 
-              <div
-                data-soft-card
-                className="border-bw-border bg-bw-fog rounded-[1.5rem] border p-4 md:col-span-3"
-              >
-                <div className="flex h-full items-center justify-between gap-4">
-                  <div>
-                    <p className="text-bw-muted text-xs font-black">Retail context</p>
-                    <p className="text-bw-ink mt-1 font-black">{matchedProduct.retailer}</p>
-                    <p className="text-bw-muted mt-1 text-sm font-medium">
-                      {matchedProduct.category}
-                    </p>
-                  </div>
-                  <p className="font-display text-bw-ink text-3xl font-black">
-                    {formatPrice(matchedProduct.currentPrice, matchedProduct.currency)}
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
