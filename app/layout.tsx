@@ -7,14 +7,14 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: {
-    default: "BuyWise AI - Know what to buy before you buy",
-    template: "%s | BuyWise AI",
+    default: "IsItABuy - Know if it is worth buying",
+    template: "%s | IsItABuy",
   },
   description:
     "AI-powered product decision assistant. Get a clear Buy, Wait, Avoid, or Better Alternative verdict before you spend.",
   openGraph: {
-    title: "BuyWise AI",
-    description: "Know what to buy before you buy.",
+    title: "IsItABuy",
+    description: "Know if a product is worth buying before checkout.",
     type: "website",
   },
 };

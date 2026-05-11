@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import {
@@ -22,7 +23,7 @@ import {
   Zap,
 } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
-import { demoProduct } from "@/lib/demo-product";
+import { demoProduct, productCatalog } from "@/lib/demo-product";
 import { cn, formatPrice } from "@/lib/utils";
 import { verdictTheme } from "@/lib/verdict-theme";
 import { useLenisScroll } from "@/providers/lenis-provider";
@@ -58,9 +59,32 @@ const offerCards = [
   },
   {
     eyebrow: "skip what you",
-    title: "shouldn’t",
+    title: "shouldn't",
     body: "Bad timing, weak trust signals, and noisy hype.",
     tone: "bg-bw-amber-soft",
+  },
+] as const;
+
+const modeStories = {
+  Link: "Reading retailer price, title, availability, and trust signals.",
+  Search: "Matching products across stores before ranking the cleanest option.",
+  Barcode: "Turning shelf scans into price history and review checks.",
+  Image: "Using visual clues to identify the product before scoring it.",
+} satisfies Record<(typeof inputModes)[number]["label"], string>;
+
+const liveSignals = [
+  { label: "Price pulse", value: "$318-$349 range", tone: "bg-bw-amber-soft", dot: "bg-bw-amber" },
+  {
+    label: "Review signal",
+    value: "stable, 18.4k read",
+    tone: "bg-bw-blue-soft",
+    dot: "bg-bw-blue",
+  },
+  {
+    label: "Trust check",
+    value: "retailer verified",
+    tone: "bg-bw-green-soft",
+    dot: "bg-bw-green",
   },
 ] as const;
 
@@ -106,7 +130,7 @@ const verdictCards: Array<{ verdict: Verdict; title: string; body: string }> = [
   {
     verdict: "Better Alternative Available",
     title: "A cleaner pick wins",
-    body: "BuyWise shows the stronger option when evidence supports it.",
+    body: "IsItABuy shows the stronger option when evidence supports it.",
   },
 ];
 
@@ -142,10 +166,61 @@ function Reveal({ children, className }: { children: React.ReactNode; className?
 
 export function HomeExperience() {
   const scopeRef = useRef<HTMLElement>(null);
+  const heroPanelRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<number | null>(null);
   const scrollTo = useLenisScroll();
   const shouldReduceMotion = useReducedMotion();
+  const [selectedMode, setSelectedMode] = useState<(typeof inputModes)[number]["label"]>("Link");
+  const [activeSignal, setActiveSignal] = useState(0);
   const alternative = demoProduct.alternatives[0];
   const verdict = verdictTheme[demoProduct.verdict];
+
+  useEffect(() => {
+    if (shouldReduceMotion) return;
+
+    const interval = window.setInterval(() => {
+      setActiveSignal((current) => (current + 1) % liveSignals.length);
+    }, 1800);
+
+    return () => window.clearInterval(interval);
+  }, [shouldReduceMotion]);
+
+  useEffect(() => {
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    };
+  }, []);
+
+  function onPanelPointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (shouldReduceMotion || !heroPanelRef.current) return;
+
+    const panel = heroPanelRef.current;
+    const rect = panel.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const xPercent = x / rect.width;
+    const yPercent = y / rect.height;
+    const tiltX = (0.5 - yPercent) * 4;
+    const tiltY = (xPercent - 0.5) * 5;
+
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+
+    frameRef.current = requestAnimationFrame(() => {
+      panel.style.setProperty("--spot-x", `${xPercent * 100}%`);
+      panel.style.setProperty("--spot-y", `${yPercent * 100}%`);
+      panel.style.setProperty("--tilt-x", `${tiltX}deg`);
+      panel.style.setProperty("--tilt-y", `${tiltY}deg`);
+    });
+  }
+
+  function onPanelPointerLeave() {
+    if (!heroPanelRef.current) return;
+
+    heroPanelRef.current.style.setProperty("--spot-x", "50%");
+    heroPanelRef.current.style.setProperty("--spot-y", "50%");
+    heroPanelRef.current.style.setProperty("--tilt-x", "0deg");
+    heroPanelRef.current.style.setProperty("--tilt-y", "0deg");
+  }
 
   useGSAP(
     () => {
@@ -169,7 +244,7 @@ export function HomeExperience() {
             <span className="bg-bw-ink flex size-11 items-center justify-center rounded-full text-white">
               <Sparkles className="text-bw-mint size-4" />
             </span>
-            <span className="font-display text-xl font-black">BuyWise</span>
+            <span className="font-display text-xl font-black">IsItABuy</span>
           </Link>
 
           <nav className="border-bw-border bg-bw-fog text-bw-muted hidden items-center gap-1 rounded-full border p-1 text-sm font-black md:flex">
@@ -221,8 +296,8 @@ export function HomeExperience() {
           </h1>
 
           <p data-hero-copy className="text-bw-muted mt-6 max-w-xl text-lg leading-8 font-medium">
-            Paste a link or search a product. BuyWise gives you a clean verdict, explains the buying
-            signals, and points out better alternatives before checkout.
+            Paste a link or search a product. IsItABuy gives you a clean verdict, explains the
+            buying signals, and points out better alternatives before checkout.
           </p>
 
           <div data-hero-copy className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -257,13 +332,19 @@ export function HomeExperience() {
         </div>
 
         <div
+          ref={heroPanelRef}
           data-hero-panel
-          className="border-bw-border rounded-[2rem] border bg-white p-4 shadow-[0_20px_70px_rgba(44,37,24,0.1)] md:p-5"
+          className="living-panel border-bw-border rounded-[2rem] border bg-white p-4 shadow-[0_20px_70px_rgba(44,37,24,0.1)] md:p-5"
+          onPointerLeave={onPanelPointerLeave}
+          onPointerMove={onPanelPointerMove}
         >
-          <div className="rounded-[1.7rem] bg-[linear-gradient(135deg,#fff3cf,#eef6ff_52%,#e8faef)] p-4">
+          <div className="relative overflow-hidden rounded-[1.7rem] bg-[linear-gradient(135deg,#fff3cf,#eef6ff_52%,#e8faef)] p-4">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-bw-muted text-sm font-black">Live checker</p>
+                <p className="text-bw-muted flex items-center gap-2 text-sm font-black">
+                  <span className="bw-breathe bg-bw-green size-2 rounded-full" />
+                  Live checker
+                </p>
                 <p className="font-display text-bw-ink text-2xl font-black">
                   Paste. Score. Decide.
                 </p>
@@ -274,27 +355,42 @@ export function HomeExperience() {
             </div>
 
             <div id="checker" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {inputModes.map((mode, index) => {
+              {inputModes.map((mode) => {
                 const Icon = mode.icon;
+                const active = selectedMode === mode.label;
 
                 return (
                   <motion.button
                     key={mode.label}
                     className={cn(
                       "flex h-12 items-center justify-center gap-2 rounded-full border text-sm font-black transition",
-                      index === 0
-                        ? "border-primary/40 text-primary bg-white"
+                      active
+                        ? "border-primary/40 text-primary bg-white shadow-sm"
                         : "border-bw-border text-bw-muted hover:text-bw-ink bg-white/70"
                     )}
+                    onClick={() => setSelectedMode(mode.label)}
                     type="button"
                     whileHover={shouldReduceMotion ? undefined : { y: -2 }}
                     transition={spring}
                   >
                     <Icon className="size-4" />
                     {mode.label}
+                    {active ? (
+                      <span className="bw-breathe bg-primary size-1.5 rounded-full" />
+                    ) : null}
                   </motion.button>
                 );
               })}
+            </div>
+
+            <div className="mt-3 rounded-[1.25rem] border border-white/80 bg-white/72 px-4 py-3">
+              <div className="flex items-center gap-2">
+                <span className="bw-breathe bg-bw-green size-2 rounded-full" />
+                <p className="text-bw-ink text-sm font-black">{selectedMode} mode is awake</p>
+              </div>
+              <p className="text-bw-muted mt-1 text-sm leading-6 font-medium">
+                {modeStories[selectedMode]}
+              </p>
             </div>
 
             <form action="/search" className="mt-4 grid gap-3 md:grid-cols-[1fr_auto]">
@@ -316,8 +412,46 @@ export function HomeExperience() {
               </button>
             </form>
 
+            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+              {liveSignals.map((signal, index) => (
+                <button
+                  key={signal.label}
+                  className={cn(
+                    "rounded-[1.25rem] border px-4 py-3 text-left transition",
+                    activeSignal === index
+                      ? `${signal.tone} border-bw-border bw-live-slide`
+                      : "border-white/80 bg-white/64"
+                  )}
+                  type="button"
+                  onClick={() => setActiveSignal(index)}
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={cn(
+                        "size-2 rounded-full",
+                        signal.dot,
+                        activeSignal === index && "bw-breathe"
+                      )}
+                    />
+                    <p className="text-bw-muted text-xs font-black">{signal.label}</p>
+                  </div>
+                  <p className="text-bw-ink mt-1 text-sm font-black">{signal.value}</p>
+                </button>
+              ))}
+            </div>
+
             <div className="mt-5 grid gap-3 md:grid-cols-[1fr_0.78fr]">
               <div data-soft-card className="border-bw-border rounded-[1.5rem] border bg-white p-5">
+                <div className="border-bw-border bg-bw-fog mb-4 h-36 overflow-hidden rounded-[1.2rem] border">
+                  <Image
+                    alt={demoProduct.name}
+                    className="h-full w-full object-cover"
+                    height={288}
+                    loading="eager"
+                    src={demoProduct.imageUrl}
+                    width={480}
+                  />
+                </div>
                 <p className="text-bw-muted text-sm font-black">Demo product</p>
                 <h2 className="font-display text-bw-ink mt-2 text-2xl leading-tight font-black">
                   {demoProduct.name}
@@ -387,10 +521,70 @@ export function HomeExperience() {
         ))}
       </section>
 
+      <section className="mx-auto max-w-7xl px-4 py-12">
+        <Reveal className="max-w-3xl">
+          <p className="text-primary text-sm font-black">Live demo products</p>
+          <h2 className="font-display text-bw-ink mt-4 text-4xl leading-tight font-black md:text-6xl">
+            Test the report on real product categories.
+          </h2>
+        </Reveal>
+
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {productCatalog.map((product) => {
+            const productVerdict = verdictTheme[product.verdict];
+
+            return (
+              <motion.article
+                key={product.slug}
+                className="border-bw-border overflow-hidden rounded-[2rem] border bg-white shadow-[0_10px_30px_rgba(44,37,24,0.06)]"
+                transition={spring}
+                whileHover={shouldReduceMotion ? undefined : { y: -5 }}
+              >
+                <div className="bg-bw-fog h-56">
+                  <Image
+                    alt={product.name}
+                    className="h-full w-full object-cover"
+                    height={360}
+                    loading="lazy"
+                    src={product.imageUrl}
+                    width={640}
+                  />
+                </div>
+                <div className="p-5">
+                  <span
+                    className={cn(
+                      "inline-flex rounded-full px-3 py-1 text-xs font-black",
+                      productVerdict.soft
+                    )}
+                  >
+                    {product.verdict}
+                  </span>
+                  <h3 className="font-display text-bw-ink mt-4 text-2xl leading-tight font-black">
+                    {product.name}
+                  </h3>
+                  <div className="text-bw-muted mt-3 flex items-center gap-2 text-sm font-bold">
+                    <Star className="text-bw-amber size-4 fill-current" />
+                    {product.reviewRating} rating ·{" "}
+                    {formatPrice(product.currentPrice, product.currency)}
+                  </div>
+                  <Link
+                    className="bg-bw-ink mt-5 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-black text-white"
+                    href={`/product/${product.slug}`}
+                  >
+                    Open analytics
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </div>
+              </motion.article>
+            );
+          })}
+        </div>
+      </section>
+
       <section id="simple" className="border-bw-border border-y bg-white py-20">
         <div className="mx-auto max-w-7xl px-4">
           <Reveal className="max-w-3xl">
-            <p className="text-primary text-sm font-black">BuyWise is simple</p>
+            <p className="text-primary text-sm font-black">IsItABuy is simple</p>
             <h2 className="font-display text-bw-ink mt-4 text-4xl leading-tight font-black md:text-6xl">
               From product link to buying decision instantly.
             </h2>
@@ -469,7 +663,7 @@ export function HomeExperience() {
                 Premium polish without hiding the buying rules.
               </h2>
               <p className="text-bw-muted mt-5 max-w-2xl text-base leading-8 font-medium">
-                BuyWise can earn commission from some links, but ranking remains neutral. The
+                IsItABuy can earn commission from some links, but ranking remains neutral. The
                 disclosure appears near recommendation and buy actions by design.
               </p>
             </Reveal>
@@ -495,7 +689,7 @@ export function HomeExperience() {
       </section>
 
       <footer className="text-bw-muted mx-auto flex max-w-7xl flex-col gap-3 px-4 py-10 text-sm font-bold sm:flex-row sm:items-center sm:justify-between">
-        <p>BuyWise AI</p>
+        <p>IsItABuy</p>
         <button className="hover:text-bw-ink text-left" type="button" onClick={() => scrollTo(0)}>
           Back to top
         </button>

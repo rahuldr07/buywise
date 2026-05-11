@@ -262,6 +262,37 @@ html.lenis body {
   filter: blur(0.2px);
 }
 
+.living-panel {
+  --spot-x: 50%;
+  --spot-y: 50%;
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  position: relative;
+  transform: perspective(1200px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.living-panel::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--spot-x) var(--spot-y),
+    rgba(255, 255, 255, 0.74),
+    transparent 34%
+  );
+  opacity: 0.72;
+}
+
+.living-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
 @keyframes bw-fade-up {
   from {
     opacity: 0;
@@ -302,6 +333,40 @@ html.lenis body {
   }
 }
 
+@keyframes bw-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.72;
+  }
+
+  50% {
+    transform: scale(1.14);
+    opacity: 1;
+  }
+}
+
+@keyframes bw-orbit {
+  from {
+    transform: rotate(0deg) translateX(34px) rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg) translateX(34px) rotate(-360deg);
+  }
+}
+
+@keyframes bw-live-slide {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
 .bw-fade-up {
   animation: bw-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -312,6 +377,18 @@ html.lenis body {
 
 .bw-float {
   animation: bw-float 7s ease-in-out infinite;
+}
+
+.bw-breathe {
+  animation: bw-breathe 2.4s ease-in-out infinite;
+}
+
+.bw-orbit {
+  animation: bw-orbit 8s linear infinite;
+}
+
+.bw-live-slide {
+  animation: bw-live-slide 1.8s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

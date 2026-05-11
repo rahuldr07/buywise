@@ -73,7 +73,7 @@ export function PriceAlertDialog({
               Track this product
             </DialogTitle>
             <DialogDescription className="text-bw-muted mt-2 max-w-md text-sm leading-6">
-              Set a target price for {productName}. Alerts need an account so BuyWise can save the
+              Set a target price for {productName}. Alerts need an account so IsItABuy can save the
               product and send updates.
             </DialogDescription>
           </div>

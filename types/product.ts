@@ -6,6 +6,7 @@ export interface ProductVerdict {
   name: string;
   brand: string;
   category: string;
+  imageUrl: string;
   retailer: string;
   retailerUrl: string;
   currentPrice: number;
@@ -24,6 +25,7 @@ export interface ProductVerdict {
   priceHistory: PricePoint[];
   alternatives: Alternative[];
   sources: Source[];
+  reviewInsights: ReviewInsight[];
 }
 
 export interface ScoreCard {
@@ -55,4 +57,11 @@ export interface Source {
   label: string;
   detail: string;
   url: string;
+}
+
+export interface ReviewInsight {
+  source: "Amazon" | "Best Buy" | "Reddit" | "YouTube" | "Wirecutter" | "The Verge";
+  rating: string;
+  sentiment: "Positive" | "Mixed" | "Negative";
+  summary: string;
 }
