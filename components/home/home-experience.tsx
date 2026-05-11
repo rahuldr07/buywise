@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import {
@@ -27,7 +28,7 @@ import { demoProduct, productCatalog } from "@/lib/demo-product";
 import { cn, formatPrice } from "@/lib/utils";
 import { verdictTheme } from "@/lib/verdict-theme";
 import { useLenisScroll } from "@/providers/lenis-provider";
-import type { Verdict } from "@/types/product";
+import type { ProductVerdict, Verdict } from "@/types/product";
 
 gsap.registerPlugin(useGSAP);
 
@@ -36,18 +37,6 @@ const inputModes = [
   { label: "Search", icon: Search },
   { label: "Barcode", icon: ScanBarcode },
   { label: "Image", icon: Camera },
-] as const;
-
-const proof = [
-  { label: "AI Buy Score", value: demoProduct.aiBuyScore },
-  { label: "Confidence", value: `${demoProduct.confidenceScore}%` },
-  { label: "Reviews scanned", value: "18.4k" },
-] as const;
-
-const heroInsights = [
-  { label: "Top review source", value: "Amazon + Reddit", tone: "bg-bw-blue-soft" },
-  { label: "Price window", value: "$318 low / $349 high", tone: "bg-bw-amber-soft" },
-  { label: "Next action", value: "Compare Bose Ultra", tone: "bg-bw-green-soft" },
 ] as const;
 
 const offerCards = [
@@ -77,22 +66,6 @@ const modeStories = {
   Barcode: "Turning shelf scans into price history and review checks.",
   Image: "Using visual clues to identify the product before scoring it.",
 } satisfies Record<(typeof inputModes)[number]["label"], string>;
-
-const liveSignals = [
-  { label: "Price pulse", value: "$318-$349 range", tone: "bg-bw-amber-soft", dot: "bg-bw-amber" },
-  {
-    label: "Review signal",
-    value: "stable, 18.4k read",
-    tone: "bg-bw-blue-soft",
-    dot: "bg-bw-blue",
-  },
-  {
-    label: "Trust check",
-    value: "retailer verified",
-    tone: "bg-bw-green-soft",
-    dot: "bg-bw-green",
-  },
-] as const;
 
 const steps = [
   {
@@ -170,26 +143,141 @@ function Reveal({ children, className }: { children: React.ReactNode; className?
   );
 }
 
+function normalizeSearch(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function fuzzyScore(query: string, product: ProductVerdict) {
+  const normalizedQuery = normalizeSearch(query);
+  if (!normalizedQuery) return product.slug === demoProduct.slug ? 1 : 0;
+
+  const haystack = normalizeSearch(
+    `${product.name} ${product.brand} ${product.category} ${product.slug}`
+  );
+  const tokens = normalizedQuery.split(" ").filter(Boolean);
+  let score = 0;
+
+  for (const token of tokens) {
+    if (haystack.includes(token)) score += token.length * 6;
+    if (product.slug.includes(token)) score += token.length * 4;
+    if (isSubsequence(token, haystack)) score += token.length;
+  }
+
+  return score;
+}
+
+function isSubsequence(needle: string, haystack: string) {
+  let cursor = 0;
+
+  for (const char of haystack) {
+    if (char === needle[cursor]) cursor += 1;
+    if (cursor === needle.length) return true;
+  }
+
+  return false;
+}
+
+function findBestProduct(query: string) {
+  return productCatalog.reduce((best, product) => {
+    return fuzzyScore(query, product) > fuzzyScore(query, best) ? product : best;
+  }, demoProduct);
+}
+
+function compactReviewCount(count: number) {
+  return count >= 1000 ? `${(count / 1000).toFixed(1)}k` : String(count);
+}
+
+function getProof(product: ProductVerdict) {
+  return [
+    { label: "AI Buy Score", value: product.aiBuyScore },
+    { label: "Confidence", value: `${product.confidenceScore}%` },
+    { label: "Reviews scanned", value: compactReviewCount(product.reviewCount) },
+  ] as const;
+}
+
+function getHeroInsights(product: ProductVerdict) {
+  const prices = product.priceHistory.map((point) => point.price);
+  const low = Math.min(...prices);
+  const high = Math.max(...prices);
+  const firstAlternative = product.alternatives[0];
+
+  return [
+    {
+      label: "Top review source",
+      value: product.reviewInsights
+        .slice(0, 2)
+        .map((review) => review.source)
+        .join(" + "),
+      tone: "bg-bw-blue-soft",
+    },
+    {
+      label: "Price window",
+      value: `${formatPrice(low, product.currency)} low / ${formatPrice(high, product.currency)} high`,
+      tone: "bg-bw-amber-soft",
+    },
+    {
+      label: "Next action",
+      value: firstAlternative ? `Compare ${firstAlternative.name.split(" ").slice(0, 2).join(" ")}` : "Open report",
+      tone: "bg-bw-green-soft",
+    },
+  ] as const;
+}
+
+function getLiveSignals(product: ProductVerdict) {
+  const prices = product.priceHistory.map((point) => point.price);
+  const low = Math.min(...prices);
+  const high = Math.max(...prices);
+
+  return [
+    {
+      label: "Price pulse",
+      value: `${formatPrice(low, product.currency)}-${formatPrice(high, product.currency)} range`,
+      tone: "bg-bw-amber-soft",
+      dot: "bg-bw-amber",
+    },
+    {
+      label: "Review signal",
+      value: `${product.reviewRating} rating, ${compactReviewCount(product.reviewCount)} read`,
+      tone: "bg-bw-blue-soft",
+      dot: "bg-bw-blue",
+    },
+    {
+      label: "Trust check",
+      value: `${product.retailer} verified`,
+      tone: "bg-bw-green-soft",
+      dot: "bg-bw-green",
+    },
+  ] as const;
+}
+
 export function HomeExperience() {
   const scopeRef = useRef<HTMLElement>(null);
   const heroPanelRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number | null>(null);
+  const router = useRouter();
   const scrollTo = useLenisScroll();
   const shouldReduceMotion = useReducedMotion();
+  const [searchQuery, setSearchQuery] = useState(demoProduct.name);
   const [selectedMode, setSelectedMode] = useState<(typeof inputModes)[number]["label"]>("Link");
   const [activeSignal, setActiveSignal] = useState(0);
-  const alternative = demoProduct.alternatives[0];
-  const verdict = verdictTheme[demoProduct.verdict];
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const matchedProduct = findBestProduct(deferredSearchQuery);
+  const proof = getProof(matchedProduct);
+  const heroInsights = getHeroInsights(matchedProduct);
+  const liveSignals = getLiveSignals(matchedProduct);
+  const signalCount = liveSignals.length;
+  const alternative = matchedProduct.alternatives[0];
+  const verdict = verdictTheme[matchedProduct.verdict];
 
   useEffect(() => {
     if (shouldReduceMotion) return;
 
     const interval = window.setInterval(() => {
-      setActiveSignal((current) => (current + 1) % liveSignals.length);
+      setActiveSignal((current) => (current + 1) % signalCount);
     }, 1800);
 
     return () => window.clearInterval(interval);
-  }, [shouldReduceMotion]);
+  }, [shouldReduceMotion, signalCount]);
 
   useEffect(() => {
     return () => {
@@ -226,6 +314,11 @@ export function HomeExperience() {
     heroPanelRef.current.style.setProperty("--spot-y", "50%");
     heroPanelRef.current.style.setProperty("--tilt-x", "0deg");
     heroPanelRef.current.style.setProperty("--tilt-y", "0deg");
+  }
+
+  function onHeroSearch(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    router.push(`/product/${matchedProduct.slug}`);
   }
 
   useGSAP(
@@ -281,8 +374,8 @@ export function HomeExperience() {
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-4 pt-8 pb-10 lg:min-h-[calc(100vh-7rem)] lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:pt-8">
-        <div>
+      <section className="mx-auto grid max-w-7xl items-stretch gap-6 px-4 pt-8 pb-10 lg:min-h-[calc(100vh-7rem)] lg:grid-cols-[0.92fr_1.08fr] lg:pt-8">
+        <div className="flex h-full flex-col items-start">
           <div
             data-hero-copy
             className="border-bw-border text-bw-muted inline-flex items-center gap-2 rounded-full border bg-white px-4 py-2 text-sm font-black shadow-sm"
@@ -317,14 +410,14 @@ export function HomeExperience() {
             </button>
             <Link
               className="border-bw-border text-bw-ink inline-flex h-[3.25rem] items-center justify-center gap-2 rounded-full border bg-white px-6 text-sm font-black shadow-sm transition hover:-translate-y-0.5"
-              href="/product/sony-wh-1000xm5"
+              href={`/product/${matchedProduct.slug}`}
             >
               View report
               <Star className="text-bw-amber size-4 fill-current" />
             </Link>
           </div>
 
-          <div data-hero-copy className="mt-7 grid max-w-xl grid-cols-3 gap-3">
+          <div data-hero-copy className="mt-7 grid w-full max-w-xl grid-cols-3 gap-3">
             {proof.map((item) => (
               <div
                 key={item.label}
@@ -336,7 +429,7 @@ export function HomeExperience() {
             ))}
           </div>
 
-          <div data-hero-copy className="mt-3 grid max-w-xl gap-2">
+          <div data-hero-copy className="mt-3 grid w-full max-w-xl gap-2">
             {heroInsights.map((item) => (
               <div
                 key={item.label}
@@ -355,11 +448,11 @@ export function HomeExperience() {
         <div
           ref={heroPanelRef}
           data-hero-panel
-          className="living-panel border-bw-border rounded-[2rem] border bg-white p-3 shadow-[0_20px_70px_rgba(44,37,24,0.1)] md:p-4"
+          className="living-panel border-bw-border h-full rounded-[2rem] border bg-white p-3 shadow-[0_20px_70px_rgba(44,37,24,0.1)] md:p-4"
           onPointerLeave={onPanelPointerLeave}
           onPointerMove={onPanelPointerMove}
         >
-          <div className="relative overflow-hidden rounded-[1.7rem] bg-[linear-gradient(135deg,#fff4d9,#f7fbff_52%,#ecfff4)] p-4">
+          <div className="relative flex h-full flex-col overflow-hidden rounded-[1.7rem] bg-[linear-gradient(135deg,#fff4d9,#f7fbff_52%,#ecfff4)] p-4">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="text-bw-muted flex items-center gap-2 text-sm font-black">
@@ -371,7 +464,7 @@ export function HomeExperience() {
                 </p>
               </div>
               <span className={cn("rounded-full px-4 py-2 text-xs font-black", verdict.badge)}>
-                {demoProduct.verdict}
+                {matchedProduct.verdict}
               </span>
             </div>
 
@@ -414,12 +507,14 @@ export function HomeExperience() {
               </p>
             </div>
 
-            <form action="/search" className="mt-3 grid gap-3 md:grid-cols-[1fr_auto]">
+            <form className="mt-3 grid gap-3 md:grid-cols-[1fr_auto]" onSubmit={onHeroSearch}>
               <label className="relative">
                 <Search className="text-bw-muted absolute top-1/2 left-4 size-5 -translate-y-1/2" />
                 <input
                   className="border-bw-border text-bw-ink placeholder:text-bw-muted/70 focus:border-primary focus:ring-primary/10 h-[3.75rem] w-full rounded-full border bg-white pr-4 pl-12 text-base font-bold transition outline-none focus:ring-4"
-                  defaultValue="Sony WH-1000XM5"
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  onFocus={() => setSelectedMode("Search")}
+                  value={searchQuery}
                   name="q"
                   placeholder="Paste a retailer link or product name"
                 />
@@ -432,6 +527,25 @@ export function HomeExperience() {
                 <Zap className="text-bw-mint size-4" />
               </button>
             </form>
+
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="text-bw-muted text-xs font-black">Fuzzy match</span>
+              {productCatalog.map((product) => (
+                <button
+                  key={product.slug}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs font-black transition",
+                    product.slug === matchedProduct.slug
+                      ? "border-primary/30 bg-bw-blue-soft text-primary"
+                      : "border-white/80 bg-white/65 text-bw-muted hover:text-bw-ink"
+                  )}
+                  type="button"
+                  onClick={() => setSearchQuery(product.name)}
+                >
+                  {product.brand}
+                </button>
+              ))}
+            </div>
 
             <div className="mt-3 grid gap-2 sm:grid-cols-3">
               {liveSignals.map((signal, index) => (
@@ -461,93 +575,123 @@ export function HomeExperience() {
               ))}
             </div>
 
-            <div className="mt-4 grid gap-3 md:grid-cols-[1fr_0.82fr]">
-              <div data-soft-card className="border-bw-border rounded-[1.5rem] border bg-white p-4">
-                <div className="border-bw-border bg-bw-fog mb-4 h-32 overflow-hidden rounded-[1.2rem] border">
+            <div className="mt-4 grid flex-1 auto-rows-[minmax(5rem,auto)] gap-3 md:grid-cols-6">
+              <Link
+                data-soft-card
+                className="border-bw-border group relative overflow-hidden rounded-[1.5rem] border bg-white p-3 md:col-span-4 md:row-span-2"
+                href={`/product/${matchedProduct.slug}`}
+              >
+                <div className="relative h-48 overflow-hidden rounded-[1.15rem] bg-bw-fog md:h-full">
                   <Image
-                    alt={demoProduct.name}
-                    className="h-full w-full object-cover"
-                    height={288}
+                    alt={matchedProduct.name}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+                    height={520}
                     loading="eager"
-                    src={demoProduct.imageUrl}
-                    width={480}
+                    src={matchedProduct.imageUrl}
+                    width={760}
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 to-transparent p-4 text-white">
+                    <p className="text-xs font-black uppercase tracking-[0.18em] opacity-80">
+                      Matched product
+                    </p>
+                    <h2 className="font-display mt-2 max-w-md text-2xl leading-tight font-black">
+                      {matchedProduct.name}
+                    </h2>
+                  </div>
+                </div>
+              </Link>
+
+              <div
+                data-soft-card
+                className="border-bw-border rounded-[1.5rem] border bg-white p-4 md:col-span-2"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-bw-muted text-xs font-black">AI score</p>
+                    <p className="font-display text-bw-ink mt-1 text-4xl font-black">
+                      {matchedProduct.aiBuyScore}
+                    </p>
+                  </div>
+                  <div
+                    className="size-14 rounded-full border border-white shadow-inner"
+                    style={{
+                      background: `conic-gradient(#182019 ${matchedProduct.aiBuyScore * 3.6}deg, #eadfc8 0deg)`,
+                    }}
                   />
                 </div>
-                <p className="text-bw-muted text-sm font-black">Demo product</p>
-                <h2 className="font-display text-bw-ink mt-2 text-xl leading-tight font-black">
-                  {demoProduct.name}
-                </h2>
-                <p className="text-bw-muted mt-3 text-sm leading-6 font-medium">
-                  {demoProduct.verdictReason}
+                <span className={cn("mt-4 inline-flex rounded-full px-3 py-1 text-xs font-black", verdict.soft)}>
+                  {matchedProduct.verdict}
+                </span>
+              </div>
+
+              <div
+                data-soft-card
+                className="border-bw-border bg-bw-fog rounded-[1.5rem] border p-4 md:col-span-2"
+              >
+                <p className="text-bw-muted text-xs font-black">Current price</p>
+                <p className="font-display text-bw-ink mt-1 text-3xl font-black">
+                  {formatPrice(matchedProduct.currentPrice, matchedProduct.currency)}
                 </p>
-                <div className="bg-bw-fog mt-4 rounded-full px-4 py-3">
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="text-bw-muted text-sm font-black">Current price</span>
-                    <span className="font-display text-bw-ink text-2xl font-black">
-                      {formatPrice(demoProduct.currentPrice, demoProduct.currency)}
-                    </span>
+                <p className="text-bw-muted mt-2 text-xs font-bold">
+                  {matchedProduct.retailer} · {matchedProduct.category}
+                </p>
+              </div>
+
+              <div
+                data-soft-card
+                className="border-bw-border rounded-[1.5rem] border bg-white p-4 md:col-span-3"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <TrendingDown className="text-bw-amber size-5" />
+                    <p className="text-bw-ink font-black">{matchedProduct.verdict}</p>
                   </div>
+                  <span className="text-bw-muted text-xs font-black">
+                    {matchedProduct.confidenceScore}% confidence
+                  </span>
+                </div>
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  {matchedProduct.scores.slice(0, 3).map((score) => (
+                    <div key={score.id} className="rounded-[1rem] bg-bw-paper p-3">
+                      <p className="text-bw-muted text-xs font-black">
+                        {shortHeroScore(score.label)}
+                      </p>
+                      <p className="font-display text-bw-ink mt-1 text-xl font-black">
+                        {score.score}
+                      </p>
+                      <div className="bg-bw-border mt-2 h-1 overflow-hidden rounded-full">
+                        <div
+                          className="bg-bw-ink h-full rounded-full"
+                          style={{ width: `${score.score}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className="grid gap-3">
-                <div
-                  data-soft-card
-                  className="border-bw-border rounded-[1.5rem] border bg-white p-4"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="text-bw-amber flex items-center gap-2">
-                      <TrendingDown className="size-5" />
-                      <span className="font-black">Wait</span>
-                    </div>
-                    <span className="font-display text-bw-ink text-2xl font-black">
-                      {demoProduct.aiBuyScore}
-                    </span>
-                  </div>
-                  <p className="text-bw-muted mt-2 text-sm leading-6 font-medium">
-                    Better price timing is likely.
-                  </p>
-                  <div className="mt-4 space-y-2">
-                    {demoProduct.scores.slice(0, 3).map((score) => (
-                      <div key={score.id}>
-                        <div className="flex items-center justify-between text-xs font-black">
-                          <span className="text-bw-muted">{shortHeroScore(score.label)}</span>
-                          <span className="text-bw-ink">{score.score}</span>
-                        </div>
-                        <div className="bg-bw-border mt-1 h-1.5 overflow-hidden rounded-full">
-                          <div
-                            className="bg-bw-ink h-full rounded-full"
-                            style={{ width: `${score.score}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))}
+              <div
+                data-soft-card
+                className={cn(
+                  "rounded-[1.5rem] border p-4 md:col-span-3",
+                  alternative
+                    ? "border-bw-green/20 bg-bw-green-soft"
+                    : "border-bw-border bg-white"
+                )}
+              >
+                <div className="flex items-start gap-3">
+                  <BadgeCheck className="text-bw-green mt-0.5 size-5 shrink-0" />
+                  <div>
+                    <p className="text-bw-ink font-black">
+                      {alternative ? "Alternative found" : "No better alternative"}
+                    </p>
+                    <p className="text-bw-muted mt-1 text-sm leading-6 font-medium">
+                      {alternative
+                        ? `${alternative.name} at ${formatPrice(alternative.price, matchedProduct.currency)}.`
+                        : "Current product is the best demo match for this search."}
+                    </p>
                   </div>
                 </div>
-
-                {alternative ? (
-                  <div
-                    data-soft-card
-                    className="border-bw-green/20 bg-bw-green-soft rounded-[1.5rem] border p-4"
-                  >
-                    <div className="flex items-start gap-3">
-                      <BadgeCheck className="text-bw-green mt-0.5 size-5 shrink-0" />
-                      <div>
-                        <p className="text-bw-ink font-black">Alternative found</p>
-                        <p className="text-bw-muted mt-1 text-sm leading-6 font-medium">
-                          {alternative.name} at{" "}
-                          {formatPrice(alternative.price, demoProduct.currency)}.
-                        </p>
-                        <div className="mt-4 flex items-center justify-between rounded-full bg-white/75 px-3 py-2">
-                          <span className="text-bw-muted text-xs font-black">Alt score</span>
-                          <span className="font-display text-bw-green text-xl font-black">
-                            {alternative.aiBuyScore}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
               </div>
             </div>
           </div>
