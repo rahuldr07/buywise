@@ -617,13 +617,13 @@ export function HomeExperience() {
               ))}
             </div>
 
-            <div className="mt-4 grid gap-3 md:grid-cols-[1fr_0.92fr] md:items-start">
+            <div className="mt-4 grid flex-1 gap-3 md:grid-cols-[1fr_0.92fr] md:items-stretch">
               <Link
                 data-soft-card
                 className="border-bw-border group relative overflow-hidden rounded-[1.5rem] border bg-white p-3"
                 href={`/product/${matchedProduct.slug}`}
               >
-                <div className="relative h-56 overflow-hidden rounded-[1.15rem] bg-bw-fog md:h-[22rem]">
+                <div className="relative h-56 overflow-hidden rounded-[1.15rem] bg-bw-fog md:h-full md:min-h-[27rem]">
                   <Image
                     alt={matchedProduct.name}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
@@ -643,7 +643,7 @@ export function HomeExperience() {
                 </div>
               </Link>
 
-              <div className="grid gap-3 self-start">
+              <div className="grid h-full gap-3">
                 <div data-soft-card className="border-bw-border rounded-[1.5rem] border bg-white p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
@@ -733,6 +733,21 @@ export function HomeExperience() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+
+                <div data-soft-card className="border-bw-border bg-bw-blue-soft rounded-[1.5rem] border p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-primary text-xs font-black">Review read</p>
+                      <p className="text-bw-ink mt-1 text-sm leading-5 font-black">
+                        {matchedProduct.reviewInsights[0]?.source ?? matchedProduct.retailer} says{" "}
+                        {matchedProduct.reviewInsights[0]?.sentiment.toLowerCase() ?? "positive"}.
+                      </p>
+                    </div>
+                    <span className="font-display text-primary text-2xl font-black">
+                      {matchedProduct.reviewRating}
+                    </span>
                   </div>
                 </div>
               </div>
