@@ -27,40 +27,42 @@ export function StagedRouteShell({
   children,
 }: StagedRouteShellProps) {
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl items-center px-5 py-16">
-      <section className="grid w-full gap-8 rounded-xl border border-bw-border bg-white p-6 shadow-sm md:p-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+    <main className="mx-auto flex min-h-screen w-full max-w-6xl items-center px-4 py-16">
+      <section className="premium-shell premium-noise grid w-full gap-8 rounded-[2.75rem] border border-white/85 p-4 shadow-[0_34px_120px_rgba(44,37,24,0.12)] md:p-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div>
-          <Badge className="rounded-lg border border-bw-border bg-bw-fog px-3 py-1 text-primary">
+          <Badge className="text-primary rounded-2xl border border-white/80 bg-white/76 px-4 py-2 shadow-sm backdrop-blur">
             {eyebrow}
           </Badge>
-          <h1 className="mt-6 max-w-3xl font-display text-4xl font-black leading-tight text-bw-ink md:text-6xl">
+          <h1 className="font-display text-bw-ink mt-6 max-w-3xl text-4xl leading-tight font-black md:text-6xl">
             {title}
           </h1>
-          <p className="mt-5 max-w-2xl text-base font-medium leading-8 text-bw-muted md:text-lg">
+          <p className="text-bw-muted mt-5 max-w-2xl text-base leading-8 font-medium md:text-lg">
             {description}
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
               href={primaryHref}
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-black text-primary-foreground transition hover:-translate-y-0.5"
+              className="text-primary-foreground inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,var(--bw-ink),var(--bw-blue)_58%,var(--bw-green))] px-5 text-sm font-black shadow-[0_16px_42px_rgba(40,103,232,0.2)] transition hover:-translate-y-0.5"
             >
               {primaryLabel}
               <ArrowRight className="size-4" />
             </Link>
             <Link
               href={secondaryHref}
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-bw-border bg-white px-5 text-sm font-black text-bw-ink transition hover:-translate-y-0.5 hover:bg-bw-fog"
+              className="text-bw-ink inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-white/80 bg-white/76 px-5 text-sm font-black shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:bg-white"
             >
               <ArrowLeft className="size-4" />
               {secondaryLabel}
             </Link>
           </div>
 
-          {note ? <p className="mt-5 text-sm font-medium leading-6 text-bw-muted">{note}</p> : null}
+          {note ? <p className="text-bw-muted mt-5 text-sm leading-6 font-medium">{note}</p> : null}
         </div>
 
-        <div className="rounded-xl border border-bw-border bg-bw-paper p-5 md:p-6">{children}</div>
+        <div className="rounded-[2rem] border border-white/80 bg-white/72 p-5 shadow-[0_18px_70px_rgba(44,37,24,0.08)] backdrop-blur md:p-6">
+          {children}
+        </div>
       </section>
     </main>
   );

@@ -7,6 +7,7 @@ import {
   BadgeCheck,
   BarChart3,
   ExternalLink,
+  Headphones,
   ShieldCheck,
   Sparkles,
   Star,
@@ -39,11 +40,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const product = demoProducts.get(slug);
 
@@ -51,14 +48,15 @@ export default async function ProductPage({
 
   const alternative = product.alternatives[0];
   const alternativeTheme = alternative ? verdictTheme[alternative.verdict] : null;
+  const verdict = verdictTheme[product.verdict];
 
   return (
-    <main className="min-h-screen px-5 py-6">
+    <main className="min-h-screen px-4 py-6">
       <div className="mx-auto max-w-7xl">
         <Button
           asChild
+          className="text-bw-ink mb-5 h-12 rounded-2xl border border-white/80 bg-white/76 px-5 shadow-sm backdrop-blur hover:bg-white"
           variant="ghost"
-          className="mb-5 h-11 rounded-xl border border-bw-border bg-white px-4 text-bw-ink hover:bg-bw-fog"
         >
           <Link href="/">
             <ArrowLeft className="mr-2 size-4" />
@@ -66,166 +64,199 @@ export default async function ProductPage({
           </Link>
         </Button>
 
-        <section className="grid gap-5 lg:grid-cols-[0.82fr_1.18fr]">
-          <div className="rounded-xl border border-bw-border bg-white p-5 shadow-sm">
-            <div className="flex aspect-square items-center justify-center rounded-xl border border-bw-border bg-bw-surface-raised">
-              <div className="relative flex size-64 items-center justify-center">
-                <div className="absolute h-48 w-48 rounded-full border-[18px] border-bw-ink" />
-                <div className="absolute h-[7.5rem] w-[7.5rem] rounded-full border-[18px] border-bw-muted" />
-                <div className="absolute top-6 h-28 w-9 rounded-full bg-bw-ink" />
-                <div className="absolute bottom-6 left-8 size-12 rounded-xl bg-primary" />
-                <div className="absolute bottom-6 right-8 size-12 rounded-xl bg-bw-green" />
+        <section className="premium-shell premium-noise rounded-[2.75rem] border border-white/85 p-3 shadow-[0_34px_120px_rgba(44,37,24,0.12)] md:p-5">
+          <div className="grid gap-5 rounded-[2.25rem] border border-white/80 bg-white/70 p-4 backdrop-blur-xl md:p-6 lg:grid-cols-[0.82fr_1.18fr]">
+            <div className="rounded-[2rem] border border-white/85 bg-white/76 p-4 shadow-[0_18px_70px_rgba(44,37,24,0.09)]">
+              <div className="border-bw-border relative flex aspect-square items-center justify-center overflow-hidden rounded-[1.75rem] border bg-[linear-gradient(145deg,#fff6da,#eef6ff_54%,#e9fbf2)]">
+                <div className="premium-orb absolute -top-14 -right-14 size-52 rounded-full opacity-70" />
+                <div className="bg-bw-coral/18 absolute bottom-10 left-10 size-28 rounded-full blur-2xl" />
+                <div className="relative flex size-72 items-center justify-center">
+                  <div className="border-bw-ink absolute h-56 w-56 rounded-full border-[20px] shadow-[0_24px_80px_rgba(24,32,25,0.18)]" />
+                  <div className="absolute h-36 w-36 rounded-full border-[18px] border-white/90 bg-white/40" />
+                  <div className="bg-bw-ink absolute top-8 flex h-32 w-12 items-center justify-center rounded-full">
+                    <Headphones className="text-bw-mint size-5" />
+                  </div>
+                  <div className="bg-bw-blue absolute bottom-8 left-9 size-14 rounded-2xl shadow-lg" />
+                  <div className="bg-bw-green absolute right-9 bottom-8 size-14 rounded-2xl shadow-lg" />
+                </div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="rounded-3xl border border-white/80 bg-white/72 p-4">
+                  <p className="text-bw-muted text-sm font-bold">Retailer</p>
+                  <p className="font-display text-bw-ink mt-1 text-xl font-black">
+                    {product.retailer}
+                  </p>
+                </div>
+                <div className="rounded-3xl border border-white/80 bg-white/72 p-4">
+                  <p className="text-bw-muted text-sm font-bold">Current price</p>
+                  <p className="font-display text-bw-ink mt-1 text-xl font-black">
+                    {formatPrice(product.currentPrice, product.currency)}
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <div className="rounded-lg bg-bw-fog p-4">
-                <p className="text-sm font-bold text-bw-muted">Retailer</p>
-                <p className="mt-1 font-display text-xl font-black text-bw-ink">{product.retailer}</p>
-              </div>
-              <div className="rounded-lg bg-bw-fog p-4">
-                <p className="text-sm font-bold text-bw-muted">Current price</p>
-                <p className="mt-1 font-display text-xl font-black text-bw-ink">
-                  {formatPrice(product.currentPrice, product.currency)}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-bw-border bg-white p-6 shadow-sm md:p-8">
-            <div className="flex flex-wrap items-center gap-3">
-              <Badge className={verdictToClass(product.verdict)}>{product.verdict}</Badge>
-              <Badge className="rounded-lg border border-bw-border bg-bw-fog px-3 py-1 text-bw-ink">
-                Confidence {product.confidenceScore}%
-              </Badge>
-              <Badge className="rounded-lg border border-bw-border bg-white px-3 py-1 text-bw-muted">
-                {product.category}
-              </Badge>
-            </div>
-
-            <h1 className="mt-5 font-display text-4xl font-black leading-tight text-bw-ink md:text-6xl">
-              {product.name}
-            </h1>
-
-            <div className="mt-5 flex flex-wrap items-center gap-3 text-sm font-bold text-bw-muted">
-              <span>{product.retailer}</span>
-              <span>|</span>
-              <span className="flex items-center gap-1.5">
-                <Star className="size-4 fill-current text-bw-amber" />
-                {product.reviewRating} from {formatNumber(product.reviewCount)} reviews
-              </span>
-              <span>|</span>
-              <span>Updated {product.lastUpdated}</span>
-            </div>
-
-            <p className="mt-7 max-w-3xl text-lg font-medium leading-8 text-bw-muted">
-              {product.verdictReason}
-            </p>
-
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-xl bg-bw-fog p-5">
-                <p className="text-sm font-black text-bw-muted">AI Buy Score</p>
-                <p className={`mt-2 font-display text-5xl font-black ${scoreToColor(product.aiBuyScore)}`}>
-                  {product.aiBuyScore}
-                </p>
-              </div>
-              <div className="rounded-xl bg-bw-fog p-5">
-                <p className="text-sm font-black text-bw-muted">Current price</p>
-                <p className="mt-2 font-display text-3xl font-black text-bw-ink">
-                  {formatPrice(product.currentPrice, product.currency)}
-                </p>
-              </div>
-              <div className="rounded-xl bg-bw-fog p-5">
-                <p className="text-sm font-black text-bw-muted">Verdict</p>
-                <p className="mt-2 font-display text-2xl font-black text-bw-ink">
+            <div className="rounded-[2rem] border border-white/85 bg-white/82 p-5 shadow-[0_18px_70px_rgba(44,37,24,0.09)] md:p-8">
+              <div className="flex flex-wrap items-center gap-3">
+                <Badge
+                  className={cn(
+                    "rounded-2xl px-4 py-2 text-xs font-black",
+                    verdictToClass(product.verdict)
+                  )}
+                >
                   {product.verdict}
-                </p>
+                </Badge>
+                <Badge className="border-bw-border bg-bw-fog text-bw-ink rounded-2xl border px-4 py-2">
+                  Confidence {product.confidenceScore}%
+                </Badge>
+                <Badge className="border-bw-border text-bw-muted rounded-2xl border bg-white px-4 py-2">
+                  {product.category}
+                </Badge>
               </div>
+
+              <h1 className="font-display text-bw-ink mt-6 text-4xl leading-tight font-black md:text-6xl">
+                {product.name}
+              </h1>
+
+              <div className="text-bw-muted mt-5 flex flex-wrap items-center gap-3 text-sm font-bold">
+                <span>{product.retailer}</span>
+                <span className="bg-bw-border h-1 w-1 rounded-full" />
+                <span className="flex items-center gap-1.5">
+                  <Star className="text-bw-amber size-4 fill-current" />
+                  {product.reviewRating} from {formatNumber(product.reviewCount)} reviews
+                </span>
+                <span className="bg-bw-border h-1 w-1 rounded-full" />
+                <span>Updated {product.lastUpdated}</span>
+              </div>
+
+              <p className="text-bw-muted mt-7 max-w-3xl text-lg leading-8 font-medium">
+                {product.verdictReason}
+              </p>
+
+              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(145deg,#ffffff,#fff3d8)] p-5 shadow-sm">
+                  <p className="text-bw-muted text-sm font-black">AI Buy Score</p>
+                  <p
+                    className={`font-display mt-2 text-5xl font-black ${scoreToColor(product.aiBuyScore)}`}
+                  >
+                    {product.aiBuyScore}
+                  </p>
+                </div>
+                <div className="rounded-[1.75rem] border border-white/80 bg-[linear-gradient(145deg,#ffffff,#eef6ff)] p-5 shadow-sm">
+                  <p className="text-bw-muted text-sm font-black">Current price</p>
+                  <p className="font-display text-bw-ink mt-2 text-3xl font-black">
+                    {formatPrice(product.currentPrice, product.currency)}
+                  </p>
+                </div>
+                <div className={cn("rounded-[1.75rem] border p-5 shadow-sm", verdict.tint)}>
+                  <p className="text-bw-muted text-sm font-black">Verdict</p>
+                  <p className="font-display text-bw-ink mt-2 text-2xl font-black">
+                    {product.verdict}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Button
+                  asChild
+                  className="text-primary-foreground h-[3.25rem] rounded-2xl bg-[linear-gradient(135deg,var(--bw-ink),var(--bw-blue)_58%,var(--bw-green))] px-5 shadow-[0_16px_42px_rgba(40,103,232,0.2)]"
+                >
+                  <a href={product.retailerUrl} rel="noreferrer" target="_blank">
+                    View retailer
+                    <ExternalLink className="ml-2 size-4" />
+                  </a>
+                </Button>
+
+                <PriceAlertDialog
+                  currency={product.currency}
+                  currentPrice={product.currentPrice}
+                  productName={product.name}
+                />
+              </div>
+
+              <p className="border-bw-green/20 bg-bw-green-soft text-bw-muted mt-5 rounded-[1.5rem] border p-4 text-sm leading-6 font-medium">
+                We may earn a commission when you buy through some links. AI scores and
+                recommendations remain commission-neutral.
+              </p>
             </div>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button asChild className="h-12 rounded-xl bg-primary px-5 text-primary-foreground">
-                <a href={product.retailerUrl} rel="noreferrer" target="_blank">
-                  View retailer
-                  <ExternalLink className="ml-2 size-4" />
-                </a>
-              </Button>
-
-              <PriceAlertDialog
-                productName={product.name}
-                currentPrice={product.currentPrice}
-                currency={product.currency}
-              />
-            </div>
-
-            <p className="mt-5 rounded-xl border border-bw-border bg-bw-green-soft p-4 text-sm font-medium leading-6 text-bw-muted">
-              We may earn a commission when you buy through some links. AI scores and
-              recommendations remain commission-neutral.
-            </p>
           </div>
         </section>
 
         <section className="mt-5 grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-xl border border-bw-border bg-white p-6 shadow-sm md:p-8">
+          <div className="rounded-[2.25rem] border border-white/85 bg-white/78 p-6 shadow-[0_18px_70px_rgba(44,37,24,0.08)] backdrop-blur md:p-8">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-black text-primary">Score breakdown</p>
-                <h2 className="mt-2 font-display text-3xl font-black text-bw-ink">
+                <p className="text-primary text-sm font-black">Score breakdown</p>
+                <h2 className="font-display text-bw-ink mt-2 text-3xl font-black">
                   Why this verdict landed here
                 </h2>
               </div>
-              <BarChart3 className="size-6 text-primary" />
+              <span className="bg-bw-blue-soft flex size-[3.25rem] items-center justify-center rounded-3xl">
+                <BarChart3 className="text-primary size-6" />
+              </span>
             </div>
 
             <div className="mt-7 space-y-4">
               {product.scores.map((score) => (
-                <div key={score.id} className="rounded-xl border border-bw-border bg-bw-paper p-5">
+                <div
+                  key={score.id}
+                  className="border-bw-border rounded-[1.75rem] border bg-white/78 p-5 shadow-sm"
+                >
                   <div className="mb-3 flex items-start justify-between gap-4">
                     <div>
-                      <p className="font-black text-bw-ink">{score.label}</p>
-                      <p className="mt-1 text-sm font-medium leading-6 text-bw-muted">
+                      <p className="text-bw-ink font-black">{score.label}</p>
+                      <p className="text-bw-muted mt-1 text-sm leading-6 font-medium">
                         {score.description}
                       </p>
                     </div>
-                    <span className={`font-display text-3xl font-black ${scoreToColor(score.score)}`}>
+                    <span
+                      className={`font-display text-3xl font-black ${scoreToColor(score.score)}`}
+                    >
                       {score.score}
                     </span>
                   </div>
-                  <Progress className="h-2 bg-bw-border" value={score.score} />
+                  <Progress className="bg-bw-border h-2" value={score.score} />
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-xl border border-bw-border bg-white p-6 shadow-sm md:p-8">
-            <p className="text-sm font-black text-bw-green">Buyer read</p>
-            <h2 className="mt-2 font-display text-3xl font-black text-bw-ink">
+          <div className="rounded-[2.25rem] border border-white/85 bg-white/78 p-6 shadow-[0_18px_70px_rgba(44,37,24,0.08)] backdrop-blur md:p-8">
+            <p className="text-bw-green text-sm font-black">Buyer read</p>
+            <h2 className="font-display text-bw-ink mt-2 text-3xl font-black">
               Pros and cons without the noise
             </h2>
 
             <Tabs className="mt-7" defaultValue="pros">
-              <TabsList className="grid h-11 w-full grid-cols-2 rounded-xl bg-bw-fog p-1">
-                <TabsTrigger className="rounded-lg data-active:bg-white" value="pros">
+              <TabsList className="bg-bw-fog grid h-12 w-full grid-cols-2 rounded-2xl p-1">
+                <TabsTrigger className="rounded-xl data-[state=active]:bg-white" value="pros">
                   Pros
                 </TabsTrigger>
-                <TabsTrigger className="rounded-lg data-active:bg-white" value="cons">
+                <TabsTrigger className="rounded-xl data-[state=active]:bg-white" value="cons">
                   Cons
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="pros" className="mt-4 space-y-3">
+              <TabsContent className="mt-4 space-y-3" value="pros">
                 {product.pros.map((pro) => (
-                  <div key={pro} className="flex gap-3 rounded-xl border border-bw-border bg-bw-paper p-4 text-sm font-medium leading-6 text-bw-muted">
-                    <BadgeCheck className="mt-0.5 size-5 shrink-0 text-bw-green" />
+                  <div
+                    key={pro}
+                    className="border-bw-border text-bw-muted flex gap-3 rounded-[1.5rem] border bg-white/76 p-4 text-sm leading-6 font-medium"
+                  >
+                    <BadgeCheck className="text-bw-green mt-0.5 size-5 shrink-0" />
                     <span>{pro}</span>
                   </div>
                 ))}
               </TabsContent>
 
-              <TabsContent value="cons" className="mt-4 space-y-3">
+              <TabsContent className="mt-4 space-y-3" value="cons">
                 {product.cons.map((con) => (
-                  <div key={con} className="flex gap-3 rounded-xl border border-bw-border bg-bw-paper p-4 text-sm font-medium leading-6 text-bw-muted">
-                    <ShieldCheck className="mt-0.5 size-5 shrink-0 text-bw-amber" />
+                  <div
+                    key={con}
+                    className="border-bw-border text-bw-muted flex gap-3 rounded-[1.5rem] border bg-white/76 p-4 text-sm leading-6 font-medium"
+                  >
+                    <ShieldCheck className="text-bw-amber mt-0.5 size-5 shrink-0" />
                     <span>{con}</span>
                   </div>
                 ))}
@@ -235,16 +266,16 @@ export default async function ProductPage({
         </section>
 
         {alternative ? (
-          <section className="mt-5 rounded-xl border border-bw-border bg-bw-green-soft p-6 shadow-sm md:p-8">
+          <section className="border-bw-green/20 mt-5 rounded-[2.25rem] border bg-[linear-gradient(135deg,#eafaf1,#ffffff_54%,#fff4dd)] p-6 shadow-[0_18px_70px_rgba(44,37,24,0.08)] md:p-8">
             <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
               <div>
-                <Badge className="rounded-lg bg-white px-3 py-1 text-bw-green">
+                <Badge className="text-bw-green rounded-2xl bg-white px-4 py-2 shadow-sm">
                   Better alternative found
                 </Badge>
-                <h2 className="mt-4 font-display text-3xl font-black text-bw-ink">
+                <h2 className="font-display text-bw-ink mt-4 text-3xl font-black">
                   {alternative.name}
                 </h2>
-                <p className="mt-3 max-w-3xl text-base font-medium leading-8 text-bw-muted">
+                <p className="text-bw-muted mt-3 max-w-3xl text-base leading-8 font-medium">
                   {alternative.tag} at {formatPrice(alternative.price, product.currency)} from{" "}
                   {alternative.retailer}. This option currently looks cleaner on comfort and recent
                   price stability.
@@ -252,24 +283,35 @@ export default async function ProductPage({
 
                 <ul className="mt-5 grid gap-3 md:grid-cols-3">
                   {alternative.reasons.map((reason) => (
-                    <li key={reason} className="rounded-xl border border-bw-border bg-white p-4 text-sm font-medium leading-6 text-bw-muted">
+                    <li
+                      key={reason}
+                      className="text-bw-muted rounded-[1.5rem] border border-white/80 bg-white/78 p-4 text-sm leading-6 font-medium shadow-sm"
+                    >
                       {reason}
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="rounded-xl border border-bw-border bg-white p-6 text-center shadow-sm">
+              <div className="rounded-[2rem] border border-white/85 bg-white/82 p-6 text-center shadow-[0_18px_70px_rgba(44,37,24,0.08)]">
                 {alternativeTheme ? (
-                  <span className={cn("rounded-lg px-3 py-1 text-xs font-black", alternativeTheme.badge)}>
+                  <span
+                    className={cn(
+                      "rounded-2xl px-4 py-2 text-xs font-black",
+                      alternativeTheme.badge
+                    )}
+                  >
                     {alternative.verdict}
                   </span>
                 ) : null}
-                <p className="mt-4 text-sm font-black text-bw-muted">Alternative score</p>
-                <p className="mt-1 font-display text-6xl font-black text-bw-green">
+                <p className="text-bw-muted mt-5 text-sm font-black">Alternative score</p>
+                <p className="font-display text-bw-green mt-1 text-6xl font-black">
                   {alternative.aiBuyScore}
                 </p>
-                <Button asChild className="mt-5 h-12 rounded-xl bg-primary px-5 text-primary-foreground">
+                <Button
+                  asChild
+                  className="bg-primary text-primary-foreground mt-5 h-12 rounded-2xl px-5"
+                >
                   <Link href={`/compare/${product.slug}`}>
                     Compare view
                     <ArrowRight className="ml-2 size-4" />
@@ -281,23 +323,26 @@ export default async function ProductPage({
         ) : null}
 
         <section className="mt-5 grid gap-5 lg:grid-cols-2">
-          <div className="rounded-xl border border-bw-border bg-white p-6 shadow-sm md:p-8">
-            <div className="flex items-center gap-2 text-bw-amber">
+          <div className="rounded-[2.25rem] border border-white/85 bg-white/78 p-6 shadow-[0_18px_70px_rgba(44,37,24,0.08)] backdrop-blur md:p-8">
+            <div className="text-bw-amber flex items-center gap-2">
               <TrendingDown className="size-5" />
               <p className="font-black">Price history preview</p>
             </div>
-            <h2 className="mt-3 font-display text-3xl font-black text-bw-ink">
+            <h2 className="font-display text-bw-ink mt-3 text-3xl font-black">
               Timing matters as much as quality
             </h2>
 
             <div className="mt-7 space-y-3">
               {product.priceHistory.map((point) => (
-                <div key={point.date} className="flex items-center justify-between rounded-xl border border-bw-border bg-bw-paper p-4">
+                <div
+                  key={point.date}
+                  className="border-bw-border flex items-center justify-between rounded-[1.5rem] border bg-white/76 p-4"
+                >
                   <div>
-                    <p className="font-black text-bw-ink">{point.date}</p>
-                    <p className="mt-1 text-sm font-medium text-bw-muted">{point.retailer}</p>
+                    <p className="text-bw-ink font-black">{point.date}</p>
+                    <p className="text-bw-muted mt-1 text-sm font-medium">{point.retailer}</p>
                   </div>
-                  <span className="font-display text-2xl font-black text-bw-ink">
+                  <span className="font-display text-bw-ink text-2xl font-black">
                     {formatPrice(point.price, product.currency)}
                   </span>
                 </div>
@@ -305,21 +350,24 @@ export default async function ProductPage({
             </div>
           </div>
 
-          <div className="rounded-xl border border-bw-border bg-white p-6 shadow-sm md:p-8">
-            <p className="text-sm font-black text-primary">Sources and evidence</p>
-            <h2 className="mt-3 font-display text-3xl font-black text-bw-ink">
+          <div className="rounded-[2.25rem] border border-white/85 bg-white/78 p-6 shadow-[0_18px_70px_rgba(44,37,24,0.08)] backdrop-blur md:p-8">
+            <p className="text-primary text-sm font-black">Sources and evidence</p>
+            <h2 className="font-display text-bw-ink mt-3 text-3xl font-black">
               Trust comes from visible source categories
             </h2>
 
             <ScrollArea className="mt-7 h-72 pr-4" data-lenis-prevent>
               <div className="space-y-3">
                 {product.sources.map((source) => (
-                  <div key={source.label} className="rounded-xl border border-bw-border bg-bw-paper p-4">
-                    <Badge className="rounded-lg border border-bw-border bg-white px-3 py-1 text-bw-ink">
+                  <div
+                    key={source.label}
+                    className="border-bw-border rounded-[1.5rem] border bg-white/76 p-4 shadow-sm"
+                  >
+                    <Badge className="border-bw-border text-bw-ink rounded-2xl border bg-white px-3 py-1">
                       {source.type.replace("_", " ")}
                     </Badge>
-                    <p className="mt-3 font-black text-bw-ink">{source.label}</p>
-                    <p className="mt-2 text-sm font-medium leading-6 text-bw-muted">
+                    <p className="text-bw-ink mt-3 font-black">{source.label}</p>
+                    <p className="text-bw-muted mt-2 text-sm leading-6 font-medium">
                       {source.detail}
                     </p>
                   </div>
@@ -329,9 +377,9 @@ export default async function ProductPage({
 
             <Separator className="my-6" />
 
-            <div className="flex gap-3 rounded-xl bg-bw-blue-soft p-4">
-              <Sparkles className="mt-0.5 size-5 shrink-0 text-primary" />
-              <p className="text-sm font-medium leading-6 text-bw-muted">
+            <div className="bg-bw-blue-soft flex gap-3 rounded-[1.5rem] p-4">
+              <Sparkles className="text-primary mt-0.5 size-5 shrink-0" />
+              <p className="text-bw-muted text-sm leading-6 font-medium">
                 Source cards are demo-grade in Phase 1, but they show how evidence will be grouped.
               </p>
             </div>

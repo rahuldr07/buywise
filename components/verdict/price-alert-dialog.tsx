@@ -34,7 +34,9 @@ export function PriceAlertDialog({
   trigger,
 }: PriceAlertDialogProps) {
   const [open, setOpen] = useState(false);
-  const [targetPrice, setTargetPrice] = useState(String(Math.max(1, Math.round(currentPrice - 30))));
+  const [targetPrice, setTargetPrice] = useState(
+    String(Math.max(1, Math.round(currentPrice - 30)))
+  );
   const [email, setEmail] = useState("");
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -51,34 +53,37 @@ export function PriceAlertDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button className="h-12 rounded-xl border border-bw-border bg-white px-5 text-bw-ink hover:bg-bw-fog">
+          <Button className="border-bw-border text-bw-ink h-[3.25rem] rounded-2xl border bg-white/82 px-5 shadow-sm backdrop-blur hover:bg-white">
             <Bell className="mr-2 size-4" />
             Track price
           </Button>
         )}
       </DialogTrigger>
 
-      <DialogContent className="rounded-xl border border-bw-border bg-white p-0 text-bw-ink shadow-2xl sm:max-w-lg" data-lenis-prevent>
+      <DialogContent
+        className="text-bw-ink overflow-hidden rounded-[2rem] border border-white/85 bg-white p-0 shadow-[0_34px_120px_rgba(44,37,24,0.18)] sm:max-w-lg"
+        data-lenis-prevent
+      >
         <DialogHeader>
-          <div className="border-b border-bw-border bg-bw-fog px-6 py-6">
-            <Badge className="mb-3 w-fit rounded-lg border border-bw-border bg-white px-3 py-1 text-primary">
+          <div className="border-bw-border border-b bg-[linear-gradient(135deg,#fff4d8,#eef6ff_52%,#eafaf1)] px-6 py-6">
+            <Badge className="text-primary mb-3 w-fit rounded-2xl border border-white/80 bg-white/82 px-4 py-2 shadow-sm">
               Login required to save alerts
             </Badge>
-            <DialogTitle className="font-display text-2xl font-black text-bw-ink">
+            <DialogTitle className="font-display text-bw-ink text-2xl font-black">
               Track this product
             </DialogTitle>
-            <DialogDescription className="mt-2 max-w-md text-sm leading-6 text-bw-muted">
+            <DialogDescription className="text-bw-muted mt-2 max-w-md text-sm leading-6">
               Set a target price for {productName}. Alerts need an account so BuyWise can save the
               product and send updates.
             </DialogDescription>
           </div>
         </DialogHeader>
 
-        <form className="space-y-5 px-6 pb-6 pt-5" onSubmit={onSubmit}>
-          <div className="rounded-xl border border-bw-border bg-bw-paper p-4">
+        <form className="space-y-5 px-6 pt-5 pb-6" onSubmit={onSubmit}>
+          <div className="border-bw-border bg-bw-fog rounded-[1.5rem] border p-4">
             <div className="flex items-center justify-between gap-4">
-              <span className="text-sm font-medium text-bw-muted">Current price</span>
-              <span className="font-display text-xl font-black text-bw-ink">
+              <span className="text-bw-muted text-sm font-medium">Current price</span>
+              <span className="font-display text-bw-ink text-xl font-black">
                 {formatPrice(currentPrice, currency)}
               </span>
             </div>
@@ -94,7 +99,7 @@ export function PriceAlertDialog({
               value={targetPrice}
               onChange={(event) => setTargetPrice(event.target.value)}
               placeholder="299"
-              className="h-12 rounded-xl border-bw-border bg-white text-bw-ink"
+              className="border-bw-border text-bw-ink h-12 rounded-2xl bg-white"
             />
           </div>
 
@@ -108,14 +113,14 @@ export function PriceAlertDialog({
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@example.com"
-              className="h-12 rounded-xl border-bw-border bg-white text-bw-ink"
+              className="border-bw-border text-bw-ink h-12 rounded-2xl bg-white"
             />
           </div>
 
           <Separator />
 
-          <div className="flex items-start gap-3 rounded-xl bg-bw-green-soft p-4 text-sm text-bw-muted">
-            <ShieldCheck className="mt-0.5 size-5 shrink-0 text-bw-green" />
+          <div className="bg-bw-green-soft text-bw-muted flex items-start gap-3 rounded-[1.5rem] p-4 text-sm">
+            <ShieldCheck className="text-bw-green mt-0.5 size-5 shrink-0" />
             <p>
               We may earn a commission from some links. AI scores and recommendations are not based
               on commission.
@@ -123,7 +128,10 @@ export function PriceAlertDialog({
           </div>
 
           <DialogFooter className="-mx-0 -mb-0 border-0 bg-transparent p-0">
-            <Button className="h-12 w-full rounded-xl bg-primary text-primary-foreground" type="submit">
+            <Button
+              className="text-primary-foreground h-12 w-full rounded-2xl bg-[linear-gradient(135deg,var(--bw-ink),var(--bw-blue)_58%,var(--bw-green))]"
+              type="submit"
+            >
               Continue to login
             </Button>
           </DialogFooter>
