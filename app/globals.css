@@ -1,0 +1,258 @@
+@import "@fontsource-variable/sora/index.css";
+@import "@fontsource-variable/dm-sans/index.css";
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.75rem;
+
+  --bw-paper: #fbfaf6;
+  --bw-surface: #ffffff;
+  --bw-surface-raised: #f3f5ed;
+  --bw-ink: #172019;
+  --bw-muted: #667365;
+  --bw-border: #dce2d4;
+  --bw-fog: #f6f1e7;
+
+  --bw-blue: #315ed8;
+  --bw-green: #2f8f61;
+  --bw-amber: #d58b1f;
+  --bw-red: #d94f64;
+  --bw-violet: #6656c9;
+
+  --bw-blue-soft: #edf2ff;
+  --bw-green-soft: #ebf7ef;
+  --bw-amber-soft: #fff4df;
+  --bw-red-soft: #fff0f2;
+  --bw-violet-soft: #f2efff;
+
+  --background: var(--bw-paper);
+  --foreground: var(--bw-ink);
+
+  --card: var(--bw-surface);
+  --card-foreground: var(--bw-ink);
+
+  --popover: var(--bw-surface);
+  --popover-foreground: var(--bw-ink);
+
+  --primary: var(--bw-blue);
+  --primary-foreground: #ffffff;
+
+  --secondary: #edf1e8;
+  --secondary-foreground: var(--bw-ink);
+
+  --muted: #edf1e8;
+  --muted-foreground: var(--bw-muted);
+
+  --accent: #eef4ec;
+  --accent-foreground: var(--bw-ink);
+
+  --destructive: var(--bw-red);
+  --destructive-foreground: #ffffff;
+
+  --border: var(--bw-border);
+  --input: #cfd8c7;
+  --ring: var(--bw-blue);
+
+  --chart-1: var(--bw-blue);
+  --chart-2: var(--bw-green);
+  --chart-3: var(--bw-amber);
+  --chart-4: var(--bw-red);
+  --chart-5: var(--bw-violet);
+}
+
+.dark {
+  --background: var(--bw-paper);
+  --foreground: var(--bw-ink);
+  --card: var(--bw-surface);
+  --card-foreground: var(--bw-ink);
+  --popover: var(--bw-surface);
+  --popover-foreground: var(--bw-ink);
+  --secondary: #edf1e8;
+  --secondary-foreground: var(--bw-ink);
+  --muted: #edf1e8;
+  --muted-foreground: var(--bw-muted);
+  --accent: #eef4ec;
+  --accent-foreground: var(--bw-ink);
+  --border: var(--bw-border);
+  --input: #cfd8c7;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-bw-paper: var(--bw-paper);
+  --color-bw-surface: var(--bw-surface);
+  --color-bw-surface-raised: var(--bw-surface-raised);
+  --color-bw-ink: var(--bw-ink);
+  --color-bw-muted: var(--bw-muted);
+  --color-bw-border: var(--bw-border);
+  --color-bw-fog: var(--bw-fog);
+
+  --color-bw-blue: var(--bw-blue);
+  --color-bw-green: var(--bw-green);
+  --color-bw-amber: var(--bw-amber);
+  --color-bw-red: var(--bw-red);
+  --color-bw-violet: var(--bw-violet);
+
+  --color-bw-blue-soft: var(--bw-blue-soft);
+  --color-bw-green-soft: var(--bw-green-soft);
+  --color-bw-amber-soft: var(--bw-amber-soft);
+  --color-bw-red-soft: var(--bw-red-soft);
+  --color-bw-violet-soft: var(--bw-violet-soft);
+
+  --color-buywise-blue: var(--bw-blue);
+  --color-buywise-green: var(--bw-green);
+  --color-buywise-navy: var(--bw-ink);
+
+  --color-verdict-buy: var(--bw-green);
+  --color-verdict-wait: var(--bw-amber);
+  --color-verdict-avoid: var(--bw-red);
+  --color-verdict-alternative: var(--bw-violet);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 16px);
+
+  --font-sans: "DM Sans Variable", system-ui, sans-serif;
+  --font-display: "Sora Variable", system-ui, sans-serif;
+  --font-heading: "Sora Variable", system-ui, sans-serif;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(23, 32, 25, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 32, 25, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, #fbfaf6 0%, #f4f7ef 52%, #ffffff 100%);
+  background-size: 56px 56px, 56px 56px, auto;
+  color: var(--foreground);
+  font-family: "DM Sans Variable", system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Sora Variable", system-ui, sans-serif;
+  letter-spacing: 0;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--bw-green) 28%, white);
+  color: var(--bw-ink);
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+@keyframes bw-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bw-scan {
+  0% {
+    transform: translateY(-18px);
+    opacity: 0;
+  }
+
+  15%,
+  82% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(180px);
+    opacity: 0;
+  }
+}
+
+.bw-fade-up {
+  animation: bw-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.bw-scan-line {
+  animation: bw-scan 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
