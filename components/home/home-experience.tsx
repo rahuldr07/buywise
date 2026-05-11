@@ -380,10 +380,10 @@ export function HomeExperience() {
 
             <h1
               data-hero-copy
-              className="font-display text-bw-ink mt-6 max-w-2xl text-5xl leading-[1.02] font-black md:text-6xl xl:text-6xl"
-            >
-              Know what to buy from{" "}
-              <span className="bg-bw-green-soft text-bw-green rounded-[1rem] px-2">
+            className="font-display text-bw-ink mt-6 max-w-2xl text-5xl leading-[1.02] font-black md:text-6xl xl:text-6xl"
+          >
+              <span className="block">Know what to buy from</span>
+              <span className="bg-bw-green-soft text-bw-green mt-2 inline-block rounded-[1rem] px-2">
                 one product link.
               </span>
             </h1>
