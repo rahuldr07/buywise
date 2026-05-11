@@ -341,8 +341,8 @@ export function HomeExperience() {
 
           <nav className="border-bw-border bg-bw-fog text-bw-muted hidden items-center gap-1 rounded-full border p-1 text-sm font-black md:flex">
             {[
-              ["Checker", "#checker"],
-              ["Simple", "#simple"],
+              ["How it works", "#simple"],
+              ["Products", "#products"],
               ["Verdicts", "#verdicts"],
               ["Trust", "#trust"],
             ].map(([label, target]) => (
@@ -358,11 +358,11 @@ export function HomeExperience() {
           </nav>
 
           <Link
-            className="bg-bw-ink inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-black text-white transition hover:-translate-y-0.5"
-            href="/product/sony-wh-1000xm5"
+            className="bg-bw-green inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-black text-white shadow-[0_10px_24px_rgba(35,168,102,0.22)] transition hover:-translate-y-0.5 hover:bg-bw-green/90"
+            href="/watchlist"
           >
-            Demo report
-            <ArrowRight className="size-4" />
+            Login
+            <LockKeyhole className="size-4" />
           </Link>
         </div>
       </header>
@@ -395,7 +395,7 @@ export function HomeExperience() {
 
             <div data-hero-copy className="mt-7 flex flex-col gap-3 sm:flex-row">
               <button
-                className="bg-bw-ink inline-flex h-[3.25rem] items-center justify-center gap-2 rounded-full px-6 text-sm font-black text-white transition hover:-translate-y-0.5"
+                className="bg-bw-green inline-flex h-[3.25rem] items-center justify-center gap-2 rounded-full px-6 text-sm font-black text-white shadow-[0_12px_28px_rgba(35,168,102,0.22)] transition hover:-translate-y-0.5 hover:bg-bw-green/90"
                 type="button"
                 onClick={() => scrollTo("#checker")}
               >
@@ -468,6 +468,32 @@ export function HomeExperience() {
                 </div>
               </div>
             </div>
+
+            <div className="border-bw-border bg-white mt-3 rounded-[1.35rem] border p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-bw-muted text-xs font-black">Why this verdict</p>
+                <span className="text-bw-ink text-xs font-black">
+                  {matchedProduct.confidenceScore}% confidence
+                </span>
+              </div>
+              <p className="text-bw-muted mt-2 line-clamp-3 text-sm leading-6 font-medium">
+                {matchedProduct.verdictReason}
+              </p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <div className="border-bw-border bg-bw-green-soft rounded-[1rem] border p-3">
+                  <p className="text-bw-green text-xs font-black">Best signal</p>
+                  <p className="text-bw-ink mt-1 text-sm font-black">
+                    {matchedProduct.pros[0]}
+                  </p>
+                </div>
+                <div className="border-bw-border bg-bw-amber-soft rounded-[1rem] border p-3">
+                  <p className="text-bw-amber text-xs font-black">Watch out</p>
+                  <p className="text-bw-ink mt-1 text-sm font-black">
+                    {matchedProduct.cons[0]}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -536,11 +562,11 @@ export function HomeExperience() {
                 />
               </label>
               <button
-                className="bg-bw-ink inline-flex h-[3.75rem] items-center justify-center gap-2 rounded-full px-6 text-sm font-black text-white transition hover:-translate-y-0.5"
+                className="bg-primary inline-flex h-[3.75rem] items-center justify-center gap-2 rounded-full px-6 text-sm font-black text-white shadow-[0_12px_28px_rgba(40,103,232,0.22)] transition hover:-translate-y-0.5 hover:bg-primary/90"
                 type="submit"
               >
                 Analyze
-                <Zap className="text-bw-mint size-4" />
+                <Zap className="size-4 text-white" />
               </button>
             </form>
 
@@ -591,13 +617,13 @@ export function HomeExperience() {
               ))}
             </div>
 
-            <div className="mt-4 grid flex-1 auto-rows-[minmax(5rem,auto)] gap-3 md:grid-cols-6">
+            <div className="mt-4 grid flex-1 auto-rows-[minmax(4.25rem,auto)] gap-3 md:grid-cols-6">
               <Link
                 data-soft-card
-                className="border-bw-border group relative overflow-hidden rounded-[1.5rem] border bg-white p-3 md:col-span-3 md:row-span-3"
+                className="border-bw-border group relative overflow-hidden rounded-[1.5rem] border bg-white p-3 md:col-span-3 md:row-span-2"
                 href={`/product/${matchedProduct.slug}`}
               >
-                <div className="relative h-48 overflow-hidden rounded-[1.15rem] bg-bw-fog md:h-full">
+                <div className="relative h-48 overflow-hidden rounded-[1.15rem] bg-bw-fog md:h-full md:min-h-72">
                   <Image
                     alt={matchedProduct.name}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
@@ -663,7 +689,7 @@ export function HomeExperience() {
                 )}
               >
                 <div className="flex h-full items-stretch gap-3">
-                  <div className="border-bw-border relative h-auto min-h-28 w-28 shrink-0 overflow-hidden rounded-[1.1rem] border bg-white">
+                  <div className="border-bw-border relative h-auto min-h-20 w-20 shrink-0 overflow-hidden rounded-[1rem] border bg-white">
                     <Image
                       alt={alternative?.name ?? matchedProduct.name}
                       className="h-full w-full object-cover"
@@ -679,7 +705,7 @@ export function HomeExperience() {
                         {alternative ? "Alternative found" : "No better alternative"}
                       </p>
                     </div>
-                    <p className="text-bw-muted mt-1 text-sm leading-6 font-medium">
+                    <p className="text-bw-muted mt-1 text-sm leading-5 font-medium">
                       {alternative
                         ? `${alternative.name} at ${formatPrice(alternative.price, matchedProduct.currency)}.`
                         : "Current product is the best demo match for this search."}
@@ -694,14 +720,11 @@ export function HomeExperience() {
                     ) : null}
                   </div>
                 </div>
-                <p className="text-bw-muted mt-2 text-xs font-bold">
-                  {matchedProduct.retailer} · {matchedProduct.category}
-                </p>
               </div>
 
               <div
                 data-soft-card
-                className="border-bw-border rounded-[1.5rem] border bg-white p-4 md:col-span-3"
+                className="border-bw-border rounded-[1.5rem] border bg-white p-3 md:col-span-3"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
@@ -712,9 +735,9 @@ export function HomeExperience() {
                     {matchedProduct.confidenceScore}% confidence
                   </span>
                 </div>
-                <div className="mt-4 grid grid-cols-3 gap-2">
+                <div className="mt-3 grid grid-cols-3 gap-2">
                   {matchedProduct.scores.slice(0, 3).map((score) => (
-                    <div key={score.id} className="rounded-[1rem] bg-bw-paper p-3">
+                    <div key={score.id} className="rounded-[1rem] bg-bw-paper p-2.5">
                       <p className="text-bw-muted text-xs font-black">
                         {shortHeroScore(score.label)}
                       </p>
@@ -723,7 +746,7 @@ export function HomeExperience() {
                       </p>
                       <div className="bg-bw-border mt-2 h-1 overflow-hidden rounded-full">
                         <div
-                          className="bg-bw-ink h-full rounded-full"
+                          className="bg-bw-green h-full rounded-full"
                           style={{ width: `${score.score}%` }}
                         />
                       </div>
@@ -752,7 +775,7 @@ export function HomeExperience() {
         ))}
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-12">
+      <section id="products" className="mx-auto max-w-7xl px-4 py-12">
         <Reveal className="max-w-3xl">
           <p className="text-primary text-sm font-black">Live demo products</p>
           <h2 className="font-display text-bw-ink mt-4 text-4xl leading-tight font-black md:text-6xl">
@@ -799,7 +822,7 @@ export function HomeExperience() {
                     {formatPrice(product.currentPrice, product.currency)}
                   </div>
                   <Link
-                    className="bg-bw-ink mt-5 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-black text-white"
+                    className="bg-primary mt-5 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-black text-white shadow-[0_10px_24px_rgba(40,103,232,0.18)] transition hover:-translate-y-0.5 hover:bg-primary/90"
                     href={`/product/${product.slug}`}
                   >
                     Open analytics
