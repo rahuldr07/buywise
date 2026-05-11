@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { demoProducts } from "@/lib/demo-product";
 import { cn, formatNumber, formatPrice, scoreToColor, verdictToClass } from "@/lib/utils";
 import { verdictTheme } from "@/lib/verdict-theme";
@@ -92,6 +91,53 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   <p className="text-bw-muted text-sm font-bold">Current price</p>
                   <p className="font-display text-bw-ink mt-1 text-xl font-black">
                     {formatPrice(product.currentPrice, product.currency)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-bw-border mt-4 rounded-[1.75rem] border bg-white/72 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-bw-muted text-sm font-black">Signal map</p>
+                  <Badge className={cn("rounded-2xl px-3 py-1 text-xs font-black", verdict.soft)}>
+                    {product.aiBuyScore}/100
+                  </Badge>
+                </div>
+                <div className="mt-4 space-y-3">
+                  {product.scores.slice(0, 3).map((score) => (
+                    <div key={score.id}>
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <span className="text-bw-ink text-sm font-bold">{score.label}</span>
+                        <span
+                          className={`font-display text-lg font-black ${scoreToColor(score.score)}`}
+                        >
+                          {score.score}
+                        </span>
+                      </div>
+                      <Progress className="bg-bw-border h-2" value={score.score} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-4 grid gap-3">
+                <div className="border-bw-amber/25 bg-bw-amber-soft rounded-[1.5rem] border p-4">
+                  <div className="text-bw-amber flex items-center gap-2">
+                    <TrendingDown className="size-4" />
+                    <p className="text-sm font-black">Timing read</p>
+                  </div>
+                  <p className="text-bw-muted mt-2 text-sm leading-6 font-medium">
+                    Wait for a cleaner buy point unless you need it now.
+                  </p>
+                </div>
+                <div className="border-bw-green/20 bg-bw-green-soft rounded-[1.5rem] border p-4">
+                  <div className="text-bw-green flex items-center gap-2">
+                    <BadgeCheck className="size-4" />
+                    <p className="text-sm font-black">Better option visible</p>
+                  </div>
+                  <p className="text-bw-muted mt-2 text-sm leading-6 font-medium">
+                    {alternative
+                      ? alternative.name
+                      : "BuyWise will surface alternatives when available."}
                   </p>
                 </div>
               </div>
@@ -228,40 +274,37 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               Pros and cons without the noise
             </h2>
 
-            <Tabs className="mt-7" defaultValue="pros">
-              <TabsList className="bg-bw-fog grid h-12 w-full grid-cols-2 rounded-2xl p-1">
-                <TabsTrigger className="rounded-xl data-[state=active]:bg-white" value="pros">
-                  Pros
-                </TabsTrigger>
-                <TabsTrigger className="rounded-xl data-[state=active]:bg-white" value="cons">
-                  Cons
-                </TabsTrigger>
-              </TabsList>
+            <div className="mt-7 grid gap-4 md:grid-cols-2">
+              <div className="border-bw-green/20 bg-bw-green-soft rounded-[1.75rem] border p-4">
+                <p className="font-display text-bw-ink text-xl font-black">What works</p>
+                <div className="mt-4 space-y-3">
+                  {product.pros.map((pro) => (
+                    <div
+                      key={pro}
+                      className="text-bw-muted flex gap-3 rounded-[1.35rem] border border-white/80 bg-white/78 p-4 text-sm leading-6 font-medium"
+                    >
+                      <BadgeCheck className="text-bw-green mt-0.5 size-5 shrink-0" />
+                      <span>{pro}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-              <TabsContent className="mt-4 space-y-3" value="pros">
-                {product.pros.map((pro) => (
-                  <div
-                    key={pro}
-                    className="border-bw-border text-bw-muted flex gap-3 rounded-[1.5rem] border bg-white/76 p-4 text-sm leading-6 font-medium"
-                  >
-                    <BadgeCheck className="text-bw-green mt-0.5 size-5 shrink-0" />
-                    <span>{pro}</span>
-                  </div>
-                ))}
-              </TabsContent>
-
-              <TabsContent className="mt-4 space-y-3" value="cons">
-                {product.cons.map((con) => (
-                  <div
-                    key={con}
-                    className="border-bw-border text-bw-muted flex gap-3 rounded-[1.5rem] border bg-white/76 p-4 text-sm leading-6 font-medium"
-                  >
-                    <ShieldCheck className="text-bw-amber mt-0.5 size-5 shrink-0" />
-                    <span>{con}</span>
-                  </div>
-                ))}
-              </TabsContent>
-            </Tabs>
+              <div className="border-bw-amber/25 bg-bw-amber-soft rounded-[1.75rem] border p-4">
+                <p className="font-display text-bw-ink text-xl font-black">What to watch</p>
+                <div className="mt-4 space-y-3">
+                  {product.cons.map((con) => (
+                    <div
+                      key={con}
+                      className="text-bw-muted flex gap-3 rounded-[1.35rem] border border-white/80 bg-white/78 p-4 text-sm leading-6 font-medium"
+                    >
+                      <ShieldCheck className="text-bw-amber mt-0.5 size-5 shrink-0" />
+                      <span>{con}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 

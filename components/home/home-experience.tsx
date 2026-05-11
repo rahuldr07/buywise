@@ -105,7 +105,7 @@ function Reveal({ children, className }: { children: React.ReactNode; className?
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 26 }}
+      initial={{ opacity: 0.92, y: 14 }}
       transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
       viewport={{ once: true, amount: 0.22 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -153,6 +153,7 @@ export function HomeExperience() {
           duration: 0.72,
           delay: (index % 3) * 0.04,
           ease: "power3.out",
+          immediateRender: false,
           scrollTrigger: {
             trigger: item,
             start: "top 86%",
@@ -227,19 +228,22 @@ export function HomeExperience() {
             className="border-bw-border text-bw-muted inline-flex items-center gap-2 rounded-2xl border bg-white/78 px-4 py-2 text-sm font-black shadow-sm backdrop-blur"
           >
             <ShieldCheck className="text-bw-green size-4" />
-            Premium product verdicts, no login for basic checks
+            Premium buyer intelligence, no login for basic checks
           </div>
 
           <h1
             data-hero-copy
-            className="font-display text-bw-ink mt-7 max-w-4xl text-5xl leading-[0.96] font-black md:text-7xl xl:text-8xl"
+            className="font-display text-bw-ink mt-7 max-w-3xl text-5xl leading-[1.02] font-black md:text-6xl xl:text-7xl"
           >
-            Product decisions that feel obvious before checkout.
+            The premium way to decide{" "}
+            <span className="bg-[linear-gradient(135deg,var(--bw-blue),var(--bw-green))] bg-clip-text text-transparent">
+              what to buy.
+            </span>
           </h1>
 
-          <p data-hero-copy className="text-bw-muted mt-6 max-w-2xl text-lg leading-8 font-medium">
-            BuyWise turns noisy product pages into a premium verdict: what to buy, what to skip,
-            when to wait, and which alternative is actually stronger.
+          <p data-hero-copy className="text-bw-muted mt-6 max-w-xl text-lg leading-8 font-medium">
+            BuyWise turns noisy product pages into a clear verdict cockpit: price timing, trust
+            signals, review quality, and better alternatives in one polished flow.
           </p>
 
           <div data-hero-copy className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -269,6 +273,20 @@ export function HomeExperience() {
                 <p className="text-bw-muted text-xs font-black">{item.label}</p>
                 <p className="font-display text-bw-ink mt-1 text-2xl font-black">{item.value}</p>
               </div>
+            ))}
+          </div>
+
+          <div
+            data-hero-copy
+            className="text-bw-muted mt-4 flex max-w-xl flex-wrap items-center gap-2 text-xs font-black"
+          >
+            {["Price radar", "Review signal", "Alternative finder"].map((label) => (
+              <span
+                key={label}
+                className="border-bw-border rounded-full border bg-white/68 px-3 py-2 shadow-sm backdrop-blur"
+              >
+                {label}
+              </span>
             ))}
           </div>
         </div>
