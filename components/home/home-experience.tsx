@@ -116,6 +116,12 @@ const trustRules = [
   { icon: BellRing, label: "Affiliate disclosure stays near buy flows" },
 ] as const;
 
+const heroFanStyles = [
+  "left-[3%] top-24 -rotate-8",
+  "left-1/2 top-0 z-20 -translate-x-1/2 scale-110",
+  "right-[3%] top-24 rotate-8",
+] as const;
+
 const spring = {
   type: "spring" as const,
   stiffness: 180,
@@ -245,8 +251,8 @@ function getLiveSignals(product: ProductVerdict) {
 
 export function HomeExperience() {
   const scopeRef = useRef<HTMLElement>(null);
-  const heroPanelRef = useRef<HTMLDivElement>(null);
-  const frameRef = useRef<number | null>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const lastScrollYRef = useRef(0);
   const router = useRouter();
   const scrollTo = useLenisScroll();
   const shouldReduceMotion = useReducedMotion();
@@ -273,41 +279,41 @@ export function HomeExperience() {
   }, [shouldReduceMotion, signalCount]);
 
   useEffect(() => {
-    return () => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    const header = headerRef.current;
+    if (!header) return;
+    const duration = shouldReduceMotion ? 0 : 0.28;
+
+    const showHeader = () => {
+      gsap.to(header, { autoAlpha: 1, duration, ease: "power3.out", y: 0 });
     };
-  }, []);
 
-  function onPanelPointerMove(event: React.PointerEvent<HTMLDivElement>) {
-    if (shouldReduceMotion || !heroPanelRef.current) return;
+    const hideHeader = () => {
+      gsap.to(header, { autoAlpha: 0, duration, ease: "power3.out", y: -112 });
+    };
 
-    const panel = heroPanelRef.current;
-    const rect = panel.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    const xPercent = x / rect.width;
-    const yPercent = y / rect.height;
-    const tiltX = (0.5 - yPercent) * 4;
-    const tiltY = (xPercent - 0.5) * 5;
+    const onScroll = () => {
+      const currentY = window.scrollY;
+      const previousY = lastScrollYRef.current;
 
-    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      if (currentY > previousY + 8 && currentY > 120) hideHeader();
+      if (currentY < previousY - 4 || currentY < 80) showHeader();
 
-    frameRef.current = requestAnimationFrame(() => {
-      panel.style.setProperty("--spot-x", `${xPercent * 100}%`);
-      panel.style.setProperty("--spot-y", `${yPercent * 100}%`);
-      panel.style.setProperty("--tilt-x", `${tiltX}deg`);
-      panel.style.setProperty("--tilt-y", `${tiltY}deg`);
-    });
-  }
+      lastScrollYRef.current = Math.max(currentY, 0);
+    };
 
-  function onPanelPointerLeave() {
-    if (!heroPanelRef.current) return;
+    const onWheel = (event: WheelEvent) => {
+      if (event.deltaY > 8 && window.scrollY > 80) hideHeader();
+      if (event.deltaY < -4) showHeader();
+    };
 
-    heroPanelRef.current.style.setProperty("--spot-x", "50%");
-    heroPanelRef.current.style.setProperty("--spot-y", "50%");
-    heroPanelRef.current.style.setProperty("--tilt-x", "0deg");
-    heroPanelRef.current.style.setProperty("--tilt-y", "0deg");
-  }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("wheel", onWheel, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("wheel", onWheel);
+    };
+  }, [shouldReduceMotion]);
 
   function onHeroSearch(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -322,7 +328,7 @@ export function HomeExperience() {
         .timeline({ defaults: { duration: 0.55, ease: "power3.out" } })
         .from("[data-nav]", { y: -14, autoAlpha: 0 })
         .from("[data-hero-copy]", { y: 24, autoAlpha: 0, stagger: 0.06 }, "-=0.18")
-        .from("[data-hero-panel]", { y: 26, autoAlpha: 0 }, "-=0.26")
+        .from("[data-product-stage]", { y: 26, autoAlpha: 0 }, "-=0.26")
         .from("[data-soft-card]", { y: 16, autoAlpha: 0, stagger: 0.05 }, "-=0.22");
     },
     { scope: scopeRef, dependencies: [shouldReduceMotion] }
@@ -330,25 +336,31 @@ export function HomeExperience() {
 
   return (
     <main ref={scopeRef} className="text-bw-ink min-h-screen">
-      <header data-nav className="sticky top-4 z-50 mx-auto max-w-7xl px-4">
-        <div className="border-bw-border flex h-16 items-center justify-between rounded-full border bg-white px-3 shadow-[0_10px_34px_rgba(44,37,24,0.08)] md:px-5">
+      <motion.header
+        ref={headerRef}
+        data-nav
+        className="fixed top-7 left-1/2 z-50 w-[min(calc(100%-2rem),62rem)] -translate-x-1/2"
+        initial={false}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: shouldReduceMotion ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <div className="border-bw-border flex h-[4.75rem] items-center justify-between rounded-full border bg-white/94 px-3 shadow-[0_18px_50px_rgba(44,37,24,0.12)] backdrop-blur-xl md:px-5">
           <Link className="flex items-center gap-3" href="/">
-            <span className="bg-bw-ink flex size-11 items-center justify-center rounded-full text-white">
-              <Sparkles className="text-bw-mint size-4" />
+            <span className="bg-bw-amber flex size-10 items-center justify-center rounded-full text-bw-ink">
+              <Sparkles className="size-4 fill-current" />
             </span>
-            <span className="font-display text-xl font-black">IsItABuy</span>
+            <span className="font-display text-xl font-black tracking-[-0.04em]">IsItABuy</span>
           </Link>
 
-          <nav className="border-bw-border bg-bw-fog text-bw-muted hidden items-center gap-1 rounded-full border p-1 text-sm font-black md:flex">
+          <nav className="text-bw-ink hidden items-center gap-7 text-sm font-black md:flex">
             {[
               ["How it works", "#simple"],
               ["Products", "#products"],
-              ["Verdicts", "#verdicts"],
-              ["Trust", "#trust"],
+              ["Pricing", "#pricing"],
             ].map(([label, target]) => (
               <button
                 key={target}
-                className="hover:text-bw-ink rounded-full px-4 py-2 transition hover:bg-white"
+                className="transition hover:text-bw-green"
                 type="button"
                 onClick={() => scrollTo(target)}
               >
@@ -357,78 +369,205 @@ export function HomeExperience() {
             ))}
           </nav>
 
-          <Link
-            className="bg-bw-green inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-black text-white shadow-[0_10px_24px_rgba(35,168,102,0.22)] transition hover:-translate-y-0.5 hover:bg-bw-green/90"
-            href="/watchlist"
-          >
-            Login
-            <LockKeyhole className="size-4" />
-          </Link>
-        </div>
-      </header>
-
-      <section className="mx-auto grid max-w-7xl items-stretch gap-6 px-4 pt-8 pb-10 lg:min-h-[calc(100vh-7rem)] lg:grid-cols-[0.92fr_1.08fr] lg:pt-8">
-        <div className="flex h-full flex-col items-start">
-          <div>
-            <div
-              data-hero-copy
-              className="border-bw-border text-bw-muted inline-flex items-center gap-2 rounded-full border bg-white px-4 py-2 text-sm font-black shadow-sm"
+          <div className="flex items-center gap-2">
+            <Link
+              className="bg-bw-fog text-bw-ink hidden h-12 items-center rounded-full px-6 text-sm font-black transition hover:bg-bw-border sm:inline-flex"
+              href="/watchlist"
             >
-              <ShieldCheck className="text-bw-green size-4" />
-              Product checks stay free to start
-            </div>
+              Login
+            </Link>
+            <button
+              className="bg-bw-amber text-bw-ink inline-flex h-12 items-center gap-3 rounded-full px-6 text-sm font-black shadow-[0_12px_28px_rgba(244,169,27,0.24)] transition hover:-translate-y-0.5 hover:bg-bw-amber/90"
+              type="button"
+              onClick={() => scrollTo("#checker")}
+            >
+              Get started
+              <ArrowRight className="size-4" />
+            </button>
+          </div>
+        </div>
+      </motion.header>
 
-            <h1
-              data-hero-copy
-            className="font-display text-bw-ink mt-6 max-w-2xl text-5xl leading-[1.02] font-black md:text-6xl xl:text-6xl"
+      <section className="relative mx-auto flex min-h-screen max-w-7xl flex-col items-center overflow-hidden px-4 pt-36 text-center md:pt-44">
+        <div
+          data-hero-copy
+          className="border-bw-border text-bw-muted inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-sm font-black shadow-sm backdrop-blur"
+        >
+          <ShieldCheck className="text-bw-green size-4" />
+          Product checks stay free to start
+        </div>
+
+        <h1
+          data-hero-copy
+          className="font-display text-bw-ink mt-8 max-w-6xl text-5xl leading-[0.98] font-black tracking-[-0.06em] md:text-7xl xl:text-[5.8rem]"
+        >
+          Know what to buy from{" "}
+          <span className="font-serif font-normal tracking-[-0.08em] italic">
+            one product link.
+          </span>
+        </h1>
+
+        <p
+          data-hero-copy
+          className="text-bw-muted mt-7 max-w-3xl text-base leading-8 font-medium md:text-lg"
+        >
+          IsItABuy reads price history, review quality, retailer trust, and alternatives before
+          checkout. Search naturally, paste a link, or start with a product photo.
+        </p>
+
+        <form
+          data-hero-copy
+          className="border-bw-amber/50 mt-9 grid w-full max-w-[46rem] grid-cols-[1fr_auto] items-center rounded-full border bg-white p-2 shadow-[0_18px_45px_rgba(44,37,24,0.1)]"
+          onSubmit={onHeroSearch}
+        >
+          <label className="relative min-w-0">
+            <Camera className="text-bw-muted absolute top-1/2 left-4 size-5 -translate-y-1/2" />
+            <input
+              className="text-bw-ink placeholder:text-bw-muted/70 h-12 w-full rounded-full bg-transparent pr-3 pl-12 text-sm font-bold outline-none md:text-base"
+              name="q"
+              onChange={(event) => setSearchQuery(event.target.value)}
+              onFocus={() => setSelectedMode("Search")}
+              placeholder="Paste a product link or search iPhone, headphones, shoes..."
+              value={searchQuery}
+            />
+          </label>
+          <button
+            className="bg-bw-amber text-bw-ink inline-flex h-12 items-center justify-center gap-3 rounded-full px-5 text-sm font-black transition hover:-translate-y-0.5 hover:bg-bw-amber/90 md:px-7"
+            type="submit"
           >
-              <span className="block">Know what to buy from</span>
-              <span className="bg-bw-green-soft text-bw-green mt-2 inline-block rounded-[1rem] px-2">
-                one product link.
-              </span>
-            </h1>
+            Check for free
+            <ArrowRight className="size-4" />
+          </button>
+        </form>
 
-            <p data-hero-copy className="text-bw-muted mt-5 max-w-xl text-lg leading-8 font-medium">
-              Paste a link or search a product. IsItABuy gives you a clean verdict, explains the
-              buying signals, and points out better alternatives before checkout.
+        <p data-hero-copy className="text-bw-muted mt-7 text-sm font-medium">
+          Trusted for <span className="font-black">{compactReviewCount(matchedProduct.reviewCount)}</span>{" "}
+          review signals, commission-neutral verdicts, and no-login basic checks.
+        </p>
+
+        <div
+          data-hero-copy
+          className="relative mt-10 h-[22rem] w-full max-w-5xl overflow-hidden md:h-[26rem]"
+        >
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-bw-paper to-transparent" />
+          {productCatalog.slice(0, 3).map((product, index) => {
+            const theme = verdictTheme[product.verdict];
+
+            return (
+              <motion.article
+                key={product.slug}
+                className={cn(
+                  "border-bw-border absolute w-[17rem] overflow-hidden rounded-[2rem] border bg-white p-3 text-left shadow-[0_30px_80px_rgba(44,37,24,0.16)] md:w-[21rem]",
+                  heroFanStyles[index]
+                )}
+                animate={
+                  shouldReduceMotion
+                    ? undefined
+                    : { y: index === 1 ? [0, -8, 0] : [0, 6, 0] }
+                }
+                transition={{ duration: 5 + index, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <div className="relative h-48 overflow-hidden rounded-[1.45rem] bg-bw-fog md:h-60">
+                  <Image
+                    alt={product.name}
+                    className="h-full w-full object-cover"
+                    height={420}
+                    priority={index === 1}
+                    src={product.imageUrl}
+                    width={520}
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 to-transparent p-4 text-white">
+                    <p className="text-[0.65rem] font-black tracking-[0.18em] uppercase opacity-80">
+                      Product check
+                    </p>
+                    <h2 className="font-display mt-1 line-clamp-2 text-xl leading-tight font-black">
+                      {product.name}
+                    </h2>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <span className={cn("rounded-full px-3 py-1 text-xs font-black", theme.soft)}>
+                    {product.verdict}
+                  </span>
+                  <span className="font-display text-bw-ink text-2xl font-black">
+                    {product.aiBuyScore}
+                  </span>
+                </div>
+              </motion.article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section id="checker" className="mx-auto max-w-7xl px-4 py-14">
+        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="border-bw-border rounded-[2rem] border bg-white p-5 shadow-[0_18px_50px_rgba(44,37,24,0.08)] md:p-7">
+            <p className="text-primary text-sm font-black">Get started</p>
+            <h2 className="font-display text-bw-ink mt-3 text-4xl leading-tight font-black md:text-5xl">
+              Search once. Get the cleanest buying decision.
+            </h2>
+            <p className="text-bw-muted mt-4 text-base leading-7 font-medium">
+              The hero search supports fuzzy matching. Typing “iphone”, “sony”, or “nike” switches
+              the demo report instantly before opening the full product page.
             </p>
 
-            <div data-hero-copy className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <button
-                className="bg-bw-green inline-flex h-[3.25rem] items-center justify-center gap-2 rounded-full px-6 text-sm font-black text-white shadow-[0_12px_28px_rgba(35,168,102,0.22)] transition hover:-translate-y-0.5 hover:bg-bw-green/90"
-                type="button"
-                onClick={() => scrollTo("#checker")}
-              >
-                Start checking
-                <ArrowRight className="size-4" />
-              </button>
-              <Link
-                className="border-bw-border text-bw-ink inline-flex h-[3.25rem] items-center justify-center gap-2 rounded-full border bg-white px-6 text-sm font-black shadow-sm transition hover:-translate-y-0.5"
-                href={`/product/${matchedProduct.slug}`}
-              >
-                View report
-                <Star className="text-bw-amber size-4 fill-current" />
-              </Link>
+            <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {inputModes.map((mode) => {
+                const Icon = mode.icon;
+                const active = selectedMode === mode.label;
+
+                return (
+                  <motion.button
+                    key={mode.label}
+                    className={cn(
+                      "flex h-12 items-center justify-center gap-2 rounded-full border text-sm font-black transition",
+                      active
+                        ? "border-primary/40 text-primary bg-bw-blue-soft shadow-sm"
+                        : "border-bw-border text-bw-muted hover:text-bw-ink bg-white"
+                    )}
+                    onClick={() => setSelectedMode(mode.label)}
+                    type="button"
+                    whileHover={shouldReduceMotion ? undefined : { y: -2 }}
+                    transition={spring}
+                  >
+                    <Icon className="size-4" />
+                    {mode.label}
+                  </motion.button>
+                );
+              })}
             </div>
 
-            <div data-hero-copy className="mt-7 grid w-full max-w-xl grid-cols-3 gap-3">
+            <form className="mt-4 grid gap-3 md:grid-cols-[1fr_auto]" onSubmit={onHeroSearch}>
+              <label className="relative">
+                <Search className="text-bw-muted absolute top-1/2 left-4 size-5 -translate-y-1/2" />
+                <input
+                  className="border-bw-border text-bw-ink placeholder:text-bw-muted/70 focus:border-primary focus:ring-primary/10 h-[3.75rem] w-full rounded-full border bg-white pr-4 pl-12 text-base font-bold transition outline-none focus:ring-4"
+                  name="checker-search"
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  onFocus={() => setSelectedMode("Search")}
+                  placeholder="Try iPhone, Sony headphones, Nike shoes"
+                  value={searchQuery}
+                />
+              </label>
+              <button
+                className="bg-primary inline-flex h-[3.75rem] items-center justify-center gap-2 rounded-full px-6 text-sm font-black text-white shadow-[0_12px_28px_rgba(40,103,232,0.22)] transition hover:-translate-y-0.5 hover:bg-primary/90"
+                type="submit"
+              >
+                Analyze
+                <Zap className="size-4 text-white" />
+              </button>
+            </form>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
               {proof.map((item) => (
-                <div
-                  key={item.label}
-                  className="border-bw-border rounded-[1.35rem] border bg-white p-4 shadow-sm"
-                >
+                <div key={item.label} className="border-bw-border rounded-[1.35rem] border bg-bw-paper p-4">
                   <p className="text-bw-muted text-xs font-black">{item.label}</p>
                   <p className="font-display text-bw-ink mt-1 text-2xl font-black">{item.value}</p>
                 </div>
               ))}
             </div>
-          </div>
 
-          <div
-            data-hero-copy
-            className="border-bw-border mt-4 w-full max-w-xl rounded-[1.7rem] border bg-white/72 p-3 shadow-sm backdrop-blur"
-          >
-            <div className="grid gap-2">
+            <div className="mt-4 grid gap-2">
               {heroInsights.map((item) => (
                 <div
                   key={item.label}
@@ -442,225 +581,54 @@ export function HomeExperience() {
                 </div>
               ))}
             </div>
-
-            <div className="mt-3 grid gap-3 sm:grid-cols-[8rem_1fr]">
-              <div className="border-bw-border h-28 overflow-hidden rounded-[1.25rem] border bg-bw-fog">
-                <Image
-                  alt={matchedProduct.name}
-                  className="h-full w-full object-cover"
-                  height={224}
-                  src={matchedProduct.imageUrl}
-                  width={256}
-                />
-              </div>
-              <div className="border-bw-border bg-bw-paper rounded-[1.25rem] border p-3">
-                <p className="text-bw-muted text-xs font-black">Best fuzzy match</p>
-                <p className="text-bw-ink mt-1 line-clamp-2 text-sm leading-5 font-black">
-                  {matchedProduct.name}
-                </p>
-                <div className="mt-3 flex items-center justify-between gap-3">
-                  <span className={cn("rounded-full px-3 py-1 text-xs font-black", verdict.soft)}>
-                    {matchedProduct.verdict}
-                  </span>
-                  <span className="font-display text-bw-ink text-2xl font-black">
-                    {matchedProduct.aiBuyScore}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-bw-border bg-white mt-3 rounded-[1.35rem] border p-4">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-bw-muted text-xs font-black">Why this verdict</p>
-                <span className="text-bw-ink text-xs font-black">
-                  {matchedProduct.confidenceScore}% confidence
-                </span>
-              </div>
-              <p className="text-bw-muted mt-2 line-clamp-3 text-sm leading-6 font-medium">
-                {matchedProduct.verdictReason}
-              </p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <div className="border-bw-border bg-bw-green-soft rounded-[1rem] border p-3">
-                  <p className="text-bw-green text-xs font-black">Best signal</p>
-                  <p className="text-bw-ink mt-1 text-sm font-black">
-                    {matchedProduct.pros[0]}
-                  </p>
-                </div>
-                <div className="border-bw-border bg-bw-amber-soft rounded-[1rem] border p-3">
-                  <p className="text-bw-amber text-xs font-black">Watch out</p>
-                  <p className="text-bw-ink mt-1 text-sm font-black">
-                    {matchedProduct.cons[0]}
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
-        </div>
 
-        <div
-          ref={heroPanelRef}
-          data-hero-panel
-          className="living-panel border-bw-border h-full rounded-[2rem] border bg-white p-3 shadow-[0_20px_70px_rgba(44,37,24,0.1)] md:p-4"
-          onPointerLeave={onPanelPointerLeave}
-          onPointerMove={onPanelPointerMove}
-        >
-          <div className="relative flex h-full flex-col overflow-hidden rounded-[1.7rem] bg-[linear-gradient(135deg,#fff4d9,#f7fbff_52%,#ecfff4)] p-4">
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-bw-muted flex items-center gap-2 text-sm font-black">
-                  <span className="bw-breathe bg-bw-green size-2 rounded-full" />
-                  Live checker
-                </p>
-                <p className="font-display text-bw-ink text-2xl font-black">
-                  Paste. Score. Decide.
-                </p>
-              </div>
-              <span className={cn("rounded-full px-4 py-2 text-xs font-black", verdict.badge)}>
-                {matchedProduct.verdict}
-              </span>
-            </div>
-
-            <div id="checker" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {inputModes.map((mode) => {
-                const Icon = mode.icon;
-                const active = selectedMode === mode.label;
-
-                return (
-                  <motion.button
-                    key={mode.label}
-                    className={cn(
-                      "flex h-12 items-center justify-center gap-2 rounded-full border text-sm font-black transition",
-                      active
-                        ? "border-primary/40 text-primary bg-white shadow-sm"
-                        : "border-bw-border text-bw-muted hover:text-bw-ink bg-white/70"
-                    )}
-                    onClick={() => setSelectedMode(mode.label)}
-                    type="button"
-                    whileHover={shouldReduceMotion ? undefined : { y: -2 }}
-                    transition={spring}
-                  >
-                    <Icon className="size-4" />
-                    {mode.label}
-                    {active ? (
-                      <span className="bw-breathe bg-primary size-1.5 rounded-full" />
-                    ) : null}
-                  </motion.button>
-                );
-              })}
-            </div>
-
-            <form className="mt-3 grid gap-3 md:grid-cols-[1fr_auto]" onSubmit={onHeroSearch}>
-              <label className="relative">
-                <Search className="text-bw-muted absolute top-1/2 left-4 size-5 -translate-y-1/2" />
-                <input
-                  className="border-bw-border text-bw-ink placeholder:text-bw-muted/70 focus:border-primary focus:ring-primary/10 h-[3.75rem] w-full rounded-full border bg-white pr-4 pl-12 text-base font-bold transition outline-none focus:ring-4"
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  onFocus={() => setSelectedMode("Search")}
-                  value={searchQuery}
-                  name="q"
-                  placeholder="Paste a retailer link or product name"
-                />
-              </label>
-              <button
-                className="bg-primary inline-flex h-[3.75rem] items-center justify-center gap-2 rounded-full px-6 text-sm font-black text-white shadow-[0_12px_28px_rgba(40,103,232,0.22)] transition hover:-translate-y-0.5 hover:bg-primary/90"
-                type="submit"
-              >
-                Analyze
-                <Zap className="size-4 text-white" />
-              </button>
-            </form>
-
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <span className="text-bw-muted text-xs font-black">Fuzzy match</span>
-              {productCatalog.map((product) => (
-                <button
-                  key={product.slug}
-                  className={cn(
-                    "rounded-full border px-3 py-1.5 text-xs font-black transition",
-                    product.slug === matchedProduct.slug
-                      ? "border-primary/30 bg-bw-blue-soft text-primary"
-                      : "border-white/80 bg-white/65 text-bw-muted hover:text-bw-ink"
-                  )}
-                  type="button"
-                  onClick={() => setSearchQuery(product.name)}
-                >
-                  {product.brand}
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-3 grid gap-2 sm:grid-cols-3">
-              {liveSignals.map((signal, index) => (
-                <button
-                  key={signal.label}
-                  className={cn(
-                    "rounded-[1.25rem] border px-4 py-3 text-left transition",
-                    activeSignal === index
-                      ? `${signal.tone} border-bw-border bw-live-slide`
-                      : "border-white/80 bg-white/64"
-                  )}
-                  type="button"
-                  onClick={() => setActiveSignal(index)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={cn(
-                        "size-2 rounded-full",
-                        signal.dot,
-                        activeSignal === index && "bw-breathe"
-                      )}
-                    />
-                    <p className="text-bw-muted text-xs font-black">{signal.label}</p>
-                  </div>
-                  <p className="text-bw-ink mt-1 text-sm font-black">{signal.value}</p>
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-4 grid flex-1 gap-3 md:grid-cols-[1fr_0.92fr] md:items-stretch">
+          <div
+            data-product-stage
+            className="border-bw-border overflow-hidden rounded-[2rem] border bg-[linear-gradient(135deg,#f8fbff,#ecfff4)] p-4 shadow-[0_18px_50px_rgba(44,37,24,0.08)]"
+          >
+            <div className="grid gap-4 md:grid-cols-[1fr_0.85fr]">
               <Link
                 data-soft-card
                 className="border-bw-border group relative overflow-hidden rounded-[1.5rem] border bg-white p-3"
                 href={`/product/${matchedProduct.slug}`}
               >
-                <div className="relative h-56 overflow-hidden rounded-[1.15rem] bg-bw-fog md:h-full md:min-h-[27rem]">
+                <div className="relative h-[27rem] overflow-hidden rounded-[1.15rem] bg-bw-fog">
                   <Image
                     alt={matchedProduct.name}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
-                    height={520}
+                    height={580}
                     loading="eager"
                     src={matchedProduct.imageUrl}
                     width={760}
                   />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 to-transparent p-4 text-white">
-                    <p className="text-xs font-black uppercase tracking-[0.18em] opacity-80">
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 to-transparent p-5 text-white">
+                    <p className="text-xs font-black tracking-[0.18em] uppercase opacity-80">
                       Matched product
                     </p>
-                    <h2 className="font-display mt-2 max-w-md text-2xl leading-tight font-black">
+                    <h2 className="font-display mt-2 max-w-md text-3xl leading-tight font-black">
                       {matchedProduct.name}
                     </h2>
                   </div>
                 </div>
               </Link>
 
-              <div className="grid h-full gap-3">
+              <div className="grid gap-4">
                 <div data-soft-card className="border-bw-border rounded-[1.5rem] border bg-white p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-bw-muted text-xs font-black">AI score</p>
-                      <div className="mt-1 flex flex-wrap items-end gap-3">
-                        <p className="font-display text-bw-ink text-4xl font-black">
-                          {matchedProduct.aiBuyScore}
-                        </p>
-                        <p className="font-display text-bw-ink text-2xl font-black">
-                          {formatPrice(matchedProduct.currentPrice, matchedProduct.currency)}
-                        </p>
-                      </div>
+                      <p className="font-display text-bw-ink mt-1 text-5xl font-black">
+                        {matchedProduct.aiBuyScore}
+                      </p>
                     </div>
                     <span className={cn("inline-flex rounded-full px-3 py-1 text-xs font-black", verdict.soft)}>
                       {matchedProduct.verdict}
                     </span>
                   </div>
+                  <p className="text-bw-muted mt-3 text-sm leading-6 font-medium">
+                    {matchedProduct.verdictReason}
+                  </p>
                 </div>
 
                 <div
@@ -673,13 +641,13 @@ export function HomeExperience() {
                   )}
                 >
                   <div className="flex items-stretch gap-3">
-                    <div className="border-bw-border relative h-24 w-24 shrink-0 overflow-hidden rounded-[1rem] border bg-white">
+                    <div className="border-bw-border relative h-28 w-28 shrink-0 overflow-hidden rounded-[1rem] border bg-white">
                       <Image
                         alt={alternative?.name ?? matchedProduct.name}
                         className="h-full w-full object-cover"
-                        height={220}
+                        height={240}
                         src={alternative?.imageUrl ?? matchedProduct.imageUrl}
-                        width={220}
+                        width={240}
                       />
                     </div>
                     <div className="min-w-0">
@@ -695,7 +663,7 @@ export function HomeExperience() {
                           : "Current product is the best demo match for this search."}
                       </p>
                       {alternative ? (
-                        <div className="mt-2 flex items-center justify-between gap-3 rounded-full bg-white/75 px-3 py-1.5">
+                        <div className="mt-3 flex items-center justify-between gap-3 rounded-full bg-white/75 px-3 py-1.5">
                           <span className="text-bw-muted text-xs font-black">Alt score</span>
                           <span className="font-display text-bw-green text-lg font-black">
                             {alternative.aiBuyScore}
@@ -710,7 +678,7 @@ export function HomeExperience() {
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                       <TrendingDown className="text-bw-amber size-5" />
-                      <p className="text-bw-ink font-black">{matchedProduct.verdict}</p>
+                      <p className="text-bw-ink font-black">Signal breakdown</p>
                     </div>
                     <span className="text-bw-muted text-xs font-black">
                       {matchedProduct.confidenceScore}% confidence
@@ -735,23 +703,35 @@ export function HomeExperience() {
                     ))}
                   </div>
                 </div>
-
-                <div data-soft-card className="border-bw-border bg-bw-blue-soft rounded-[1.5rem] border p-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-primary text-xs font-black">Review read</p>
-                      <p className="text-bw-ink mt-1 text-sm leading-5 font-black">
-                        {matchedProduct.reviewInsights[0]?.source ?? matchedProduct.retailer} says{" "}
-                        {matchedProduct.reviewInsights[0]?.sentiment.toLowerCase() ?? "positive"}.
-                      </p>
-                    </div>
-                    <span className="font-display text-primary text-2xl font-black">
-                      {matchedProduct.reviewRating}
-                    </span>
-                  </div>
-                </div>
               </div>
+            </div>
 
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              {liveSignals.map((signal, index) => (
+                <button
+                  key={signal.label}
+                  className={cn(
+                    "rounded-[1.25rem] border px-4 py-3 text-left transition",
+                    activeSignal === index
+                      ? `${signal.tone} border-bw-border bw-live-slide`
+                      : "border-white/80 bg-white/70"
+                  )}
+                  type="button"
+                  onClick={() => setActiveSignal(index)}
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={cn(
+                        "size-2 rounded-full",
+                        signal.dot,
+                        activeSignal === index && "bw-breathe"
+                      )}
+                    />
+                    <p className="text-bw-muted text-xs font-black">{signal.label}</p>
+                  </div>
+                  <p className="text-bw-ink mt-1 text-sm font-black">{signal.value}</p>
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -902,6 +882,21 @@ export function HomeExperience() {
               </motion.article>
             );
           })}
+        </div>
+      </section>
+
+      <section id="pricing" className="mx-auto max-w-7xl px-4 pb-20">
+        <div className="border-bw-border grid gap-4 rounded-[2.25rem] border bg-white p-4 shadow-[0_18px_50px_rgba(44,37,24,0.06)] md:grid-cols-3 md:p-5">
+          {[
+            ["Free checks", "Paste links, search products, and open basic verdicts without login."],
+            ["Saved alerts", "Login only when you want watchlists, receipts, price drops, and saved products."],
+            ["Neutral ranking", "Affiliate disclosure stays visible, and commission never changes the recommendation."],
+          ].map(([title, body]) => (
+            <article key={title} className="bg-bw-paper rounded-[1.75rem] p-5">
+              <p className="font-display text-bw-ink text-2xl font-black">{title}</p>
+              <p className="text-bw-muted mt-4 text-sm leading-6 font-medium">{body}</p>
+            </article>
+          ))}
         </div>
       </section>
 
