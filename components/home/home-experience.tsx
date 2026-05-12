@@ -282,23 +282,32 @@ export function HomeExperience() {
   useEffect(() => {
     const navShell = navShellRef.current;
     if (!navShell) return;
-    const duration = shouldReduceMotion ? 0 : 0.28;
-    const setY = gsap.quickTo(navShell, "y", { duration, ease: "power3.out" });
-    const setOpacity = gsap.quickTo(navShell, "opacity", { duration, ease: "power3.out" });
+    const hideDuration = shouldReduceMotion ? 0 : 0.24;
+    const showDuration = shouldReduceMotion ? 0 : 0.64;
+    const hideY = gsap.quickTo(navShell, "y", { duration: hideDuration, ease: "power3.out" });
+    const hideOpacity = gsap.quickTo(navShell, "opacity", {
+      duration: hideDuration,
+      ease: "power3.out",
+    });
+    const showY = gsap.quickTo(navShell, "y", { duration: showDuration, ease: "power4.out" });
+    const showOpacity = gsap.quickTo(navShell, "opacity", {
+      duration: showDuration,
+      ease: "power2.out",
+    });
 
     const showHeader = () => {
       if (!navHiddenRef.current) return;
       navHiddenRef.current = false;
-      setY(0);
-      setOpacity(1);
+      showY(0);
+      showOpacity(1);
       navShell.style.pointerEvents = "auto";
     };
 
     const hideHeader = () => {
       if (navHiddenRef.current) return;
       navHiddenRef.current = true;
-      setY(-112);
-      setOpacity(0);
+      hideY(-112);
+      hideOpacity(0);
       navShell.style.pointerEvents = "none";
     };
 
@@ -323,8 +332,10 @@ export function HomeExperience() {
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("wheel", onWheel);
-      setY.tween.kill();
-      setOpacity.tween.kill();
+      hideY.tween.kill();
+      hideOpacity.tween.kill();
+      showY.tween.kill();
+      showOpacity.tween.kill();
     };
   }, [shouldReduceMotion]);
 
