@@ -117,9 +117,9 @@ const trustRules = [
 ] as const;
 
 const heroFanStyles = [
-  "left-[3%] top-24 -rotate-8",
+  "left-[3%] top-16 -rotate-8",
   "left-1/2 top-0 z-20 -translate-x-1/2 scale-110",
-  "right-[3%] top-24 rotate-8",
+  "right-[3%] top-16 rotate-8",
 ] as const;
 
 type LenisScrollPayload = {
@@ -436,7 +436,7 @@ export function HomeExperience() {
         </motion.div>
       </header>
 
-      <section className="relative mx-auto flex min-h-screen max-w-7xl flex-col items-center overflow-x-clip px-4 pt-36 pb-20 text-center md:pt-44">
+      <section className="relative mx-auto flex min-h-[calc(100vh-2rem)] max-w-7xl flex-col items-center overflow-x-clip px-4 pt-36 pb-10 text-center md:pt-44 md:pb-12">
         <div
           data-hero-copy
           className="border-bw-border text-bw-muted inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-sm font-black shadow-sm backdrop-blur"
@@ -496,7 +496,7 @@ export function HomeExperience() {
         <div
           data-hero-fan
           data-hero-copy
-          className="relative mt-10 h-[30rem] w-full max-w-6xl overflow-visible md:h-[32rem]"
+          className="relative mt-9 h-[26rem] w-full max-w-6xl overflow-visible md:h-[28rem]"
         >
           {productCatalog.slice(0, 3).map((product, index) => {
             const theme = verdictTheme[product.verdict];
@@ -547,7 +547,7 @@ export function HomeExperience() {
         </div>
       </section>
 
-      <section id="checker" className="mx-auto max-w-7xl px-4 py-14">
+      <section id="checker" className="mx-auto max-w-7xl px-4 py-10">
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="border-bw-border rounded-[2rem] border bg-white p-5 shadow-[0_18px_50px_rgba(44,37,24,0.08)] md:p-7">
             <p className="text-primary text-sm font-black">Get started</p>
@@ -641,7 +641,7 @@ export function HomeExperience() {
                 className="border-bw-border group relative overflow-hidden rounded-[1.5rem] border bg-white p-3"
                 href={`/product/${matchedProduct.slug}`}
               >
-                <div className="relative h-[27rem] overflow-hidden rounded-[1.15rem] bg-bw-fog">
+                <div className="relative h-[23rem] overflow-hidden rounded-[1.15rem] bg-bw-fog md:h-[24rem]">
                   <Image
                     alt={matchedProduct.name}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
@@ -751,6 +751,21 @@ export function HomeExperience() {
                     ))}
                   </div>
                 </div>
+
+                <div data-soft-card className="border-bw-border bg-bw-blue-soft rounded-[1.5rem] border p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-primary text-xs font-black">Review read</p>
+                      <p className="text-bw-ink mt-1 text-sm leading-5 font-black">
+                        {matchedProduct.reviewInsights[0]?.source ?? matchedProduct.retailer} says{" "}
+                        {matchedProduct.reviewInsights[0]?.sentiment.toLowerCase() ?? "positive"}.
+                      </p>
+                    </div>
+                    <span className="font-display text-primary text-2xl font-black">
+                      {matchedProduct.reviewRating}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -785,7 +800,7 @@ export function HomeExperience() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-4 px-4 py-12 md:grid-cols-3">
+      <section className="mx-auto grid max-w-7xl gap-4 px-4 py-8 md:grid-cols-3">
         {offerCards.map((card) => (
           <motion.article
             key={card.title}
@@ -795,12 +810,17 @@ export function HomeExperience() {
           >
             <p className="text-bw-muted text-sm font-black">{card.eyebrow}</p>
             <h2 className="font-display text-bw-ink mt-3 text-5xl font-black">{card.title}</h2>
-            <p className="text-bw-muted mt-7 text-base leading-7 font-medium">{card.body}</p>
+            <p className="text-bw-muted mt-5 text-base leading-7 font-medium">{card.body}</p>
+            <div className="border-bw-border mt-6 border-t pt-4">
+              <p className="text-bw-ink text-sm font-black">
+                Ranked by price, trust, reviews, and timing.
+              </p>
+            </div>
           </motion.article>
         ))}
       </section>
 
-      <section id="products" className="mx-auto max-w-7xl px-4 py-12">
+      <section id="products" className="mx-auto max-w-7xl px-4 py-10">
         <Reveal className="max-w-3xl">
           <p className="text-primary text-sm font-black">Live demo products</p>
           <h2 className="font-display text-bw-ink mt-4 text-4xl leading-tight font-black md:text-6xl">
@@ -860,7 +880,7 @@ export function HomeExperience() {
         </div>
       </section>
 
-      <section id="simple" className="border-bw-border border-y bg-white py-20">
+      <section id="simple" className="border-bw-border border-y bg-white py-14">
         <div className="mx-auto max-w-7xl px-4">
           <Reveal className="max-w-3xl">
             <p className="text-primary text-sm font-black">IsItABuy is simple</p>
@@ -896,7 +916,7 @@ export function HomeExperience() {
         </div>
       </section>
 
-      <section id="verdicts" className="mx-auto max-w-7xl px-4 py-20">
+      <section id="verdicts" className="mx-auto max-w-7xl px-4 py-14">
         <Reveal className="max-w-3xl">
           <p className="text-primary text-sm font-black">Verdict system</p>
           <h2 className="font-display text-bw-ink mt-4 text-4xl leading-tight font-black md:text-6xl">
@@ -933,22 +953,37 @@ export function HomeExperience() {
         </div>
       </section>
 
-      <section id="pricing" className="mx-auto max-w-7xl px-4 pb-20">
-        <div className="border-bw-border grid gap-4 rounded-[2.25rem] border bg-white p-4 shadow-[0_18px_50px_rgba(44,37,24,0.06)] md:grid-cols-3 md:p-5">
-          {[
-            ["Free checks", "Paste links, search products, and open basic verdicts without login."],
-            ["Saved alerts", "Login only when you want watchlists, receipts, price drops, and saved products."],
-            ["Neutral ranking", "Affiliate disclosure stays visible, and commission never changes the recommendation."],
-          ].map(([title, body]) => (
-            <article key={title} className="bg-bw-paper rounded-[1.75rem] p-5">
-              <p className="font-display text-bw-ink text-2xl font-black">{title}</p>
-              <p className="text-bw-muted mt-4 text-sm leading-6 font-medium">{body}</p>
-            </article>
-          ))}
+      <section id="pricing" className="mx-auto max-w-7xl px-4 py-14">
+        <div className="border-bw-border rounded-[2.25rem] border bg-white p-5 shadow-[0_18px_50px_rgba(44,37,24,0.06)] md:p-7">
+          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+            <div>
+              <p className="text-primary text-sm font-black">Pricing</p>
+              <h2 className="font-display text-bw-ink mt-3 text-4xl leading-tight font-black md:text-5xl">
+                Free checks first. Login only when saving value.
+              </h2>
+            </div>
+            <p className="text-bw-muted text-base leading-7 font-medium">
+              Basic verdicts stay open so shoppers can check products before checkout. Accounts are
+              only needed for watchlists, alerts, receipts, and personalization.
+            </p>
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {[
+              ["Free checks", "Paste links, search products, and open basic verdicts without login."],
+              ["Saved alerts", "Login only when you want watchlists, receipts, price drops, and saved products."],
+              ["Neutral ranking", "Affiliate disclosure stays visible, and commission never changes the recommendation."],
+            ].map(([title, body]) => (
+              <article key={title} className="bg-bw-paper rounded-[1.75rem] p-5">
+                <p className="font-display text-bw-ink text-2xl font-black">{title}</p>
+                <p className="text-bw-muted mt-4 text-sm leading-6 font-medium">{body}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section id="trust" className="mx-auto max-w-7xl px-4 pb-20">
+      <section id="trust" className="mx-auto max-w-7xl px-4 pb-16">
         <div className="border-bw-border rounded-[2.25rem] border bg-[linear-gradient(135deg,#fff4d8,#eef6ff_58%,#eafaf1)] p-5 md:p-8">
           <div className="border-bw-border grid gap-8 rounded-[1.75rem] border bg-white p-6 md:p-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
             <Reveal>
