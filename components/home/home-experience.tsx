@@ -638,10 +638,10 @@ export function HomeExperience() {
             <div className="grid gap-4 md:grid-cols-[1fr_0.85fr]">
               <Link
                 data-soft-card
-                className="border-bw-border group relative overflow-hidden rounded-[1.5rem] border bg-white p-3"
+                className="border-bw-border group relative block h-full overflow-hidden rounded-[1.5rem] border bg-white p-3"
                 href={`/product/${matchedProduct.slug}`}
               >
-                <div className="relative h-[23rem] overflow-hidden rounded-[1.15rem] bg-bw-fog md:h-[24rem]">
+                <div className="relative h-full min-h-[23rem] overflow-hidden rounded-[1.15rem] bg-bw-fog md:min-h-[24rem]">
                   <Image
                     alt={matchedProduct.name}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
