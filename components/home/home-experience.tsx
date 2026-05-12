@@ -251,8 +251,9 @@ function getLiveSignals(product: ProductVerdict) {
 
 export function HomeExperience() {
   const scopeRef = useRef<HTMLElement>(null);
-  const headerRef = useRef<HTMLElement>(null);
+  const navShellRef = useRef<HTMLDivElement>(null);
   const lastScrollYRef = useRef(0);
+  const navHiddenRef = useRef(false);
   const router = useRouter();
   const scrollTo = useLenisScroll();
   const shouldReduceMotion = useReducedMotion();
@@ -279,16 +280,26 @@ export function HomeExperience() {
   }, [shouldReduceMotion, signalCount]);
 
   useEffect(() => {
-    const header = headerRef.current;
-    if (!header) return;
+    const navShell = navShellRef.current;
+    if (!navShell) return;
     const duration = shouldReduceMotion ? 0 : 0.28;
+    const setY = gsap.quickTo(navShell, "y", { duration, ease: "power3.out" });
+    const setOpacity = gsap.quickTo(navShell, "opacity", { duration, ease: "power3.out" });
 
     const showHeader = () => {
-      gsap.to(header, { autoAlpha: 1, duration, ease: "power3.out", y: 0 });
+      if (!navHiddenRef.current) return;
+      navHiddenRef.current = false;
+      setY(0);
+      setOpacity(1);
+      navShell.style.pointerEvents = "auto";
     };
 
     const hideHeader = () => {
-      gsap.to(header, { autoAlpha: 0, duration, ease: "power3.out", y: -112 });
+      if (navHiddenRef.current) return;
+      navHiddenRef.current = true;
+      setY(-112);
+      setOpacity(0);
+      navShell.style.pointerEvents = "none";
     };
 
     const onScroll = () => {
@@ -312,6 +323,8 @@ export function HomeExperience() {
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("wheel", onWheel);
+      setY.tween.kill();
+      setOpacity.tween.kill();
     };
   }, [shouldReduceMotion]);
 
@@ -326,7 +339,7 @@ export function HomeExperience() {
 
       gsap
         .timeline({ defaults: { duration: 0.55, ease: "power3.out" } })
-        .from("[data-nav]", { y: -14, autoAlpha: 0 })
+        .from("[data-nav-shell]", { y: -14, autoAlpha: 0 })
         .from("[data-hero-copy]", { y: 24, autoAlpha: 0, stagger: 0.06 }, "-=0.18")
         .from("[data-product-stage]", { y: 26, autoAlpha: 0 }, "-=0.26")
         .from("[data-soft-card]", { y: 16, autoAlpha: 0, stagger: 0.05 }, "-=0.22");
@@ -336,15 +349,18 @@ export function HomeExperience() {
 
   return (
     <main ref={scopeRef} className="text-bw-ink min-h-screen">
-      <motion.header
-        ref={headerRef}
+      <header
         data-nav
         className="fixed top-7 left-1/2 z-50 w-[min(calc(100%-2rem),62rem)] -translate-x-1/2"
-        initial={false}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: shouldReduceMotion ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="border-bw-border flex h-[4.75rem] items-center justify-between rounded-full border bg-white/94 px-3 shadow-[0_18px_50px_rgba(44,37,24,0.12)] backdrop-blur-xl md:px-5">
+        <motion.div
+          ref={navShellRef}
+          data-nav-shell
+          className="border-bw-border flex h-[4.75rem] items-center justify-between rounded-full border bg-white/94 px-3 shadow-[0_18px_50px_rgba(44,37,24,0.12)] backdrop-blur-xl will-change-transform md:px-5"
+          initial={false}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
           <Link className="flex items-center gap-3" href="/">
             <span className="bg-bw-amber flex size-10 items-center justify-center rounded-full text-bw-ink">
               <Sparkles className="size-4 fill-current" />
@@ -385,8 +401,8 @@ export function HomeExperience() {
               <ArrowRight className="size-4" />
             </button>
           </div>
-        </div>
-      </motion.header>
+        </motion.div>
+      </header>
 
       <section className="relative mx-auto flex min-h-screen max-w-7xl flex-col items-center overflow-hidden px-4 pt-36 text-center md:pt-44">
         <div
