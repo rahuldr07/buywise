@@ -122,6 +122,21 @@ const heroFanStyles = [
   "right-[3%] top-24 rotate-8",
 ] as const;
 
+type LenisScrollPayload = {
+  direction: -1 | 0 | 1;
+  scroll: number;
+};
+
+type LenisScrollEmitter = {
+  off?: (event: "scroll", callback: (payload: LenisScrollPayload) => void) => void;
+  on?: (event: "scroll", callback: (payload: LenisScrollPayload) => void) => void;
+};
+
+type HomeWindow = Window &
+  typeof globalThis & {
+    __buywiseLenis?: LenisScrollEmitter;
+  };
+
 const spring = {
   type: "spring" as const,
   stiffness: 180,
@@ -283,32 +298,38 @@ export function HomeExperience() {
     const navShell = navShellRef.current;
     if (!navShell) return;
     const hideDuration = shouldReduceMotion ? 0 : 0.24;
-    const showDuration = shouldReduceMotion ? 0 : 0.64;
-    const hideY = gsap.quickTo(navShell, "y", { duration: hideDuration, ease: "power3.out" });
-    const hideOpacity = gsap.quickTo(navShell, "opacity", {
-      duration: hideDuration,
-      ease: "power3.out",
-    });
-    const showY = gsap.quickTo(navShell, "y", { duration: showDuration, ease: "power4.out" });
-    const showOpacity = gsap.quickTo(navShell, "opacity", {
-      duration: showDuration,
-      ease: "power2.out",
-    });
+    const showDuration = shouldReduceMotion ? 0 : 0.82;
 
     const showHeader = () => {
       if (!navHiddenRef.current) return;
       navHiddenRef.current = false;
-      showY(0);
-      showOpacity(1);
       navShell.style.pointerEvents = "auto";
+      gsap.to(navShell, {
+        autoAlpha: 1,
+        duration: showDuration,
+        ease: "expo.out",
+        overwrite: "auto",
+        y: 0,
+      });
     };
 
     const hideHeader = () => {
       if (navHiddenRef.current) return;
       navHiddenRef.current = true;
-      hideY(-112);
-      hideOpacity(0);
       navShell.style.pointerEvents = "none";
+      gsap.to(navShell, {
+        autoAlpha: 0,
+        duration: hideDuration,
+        ease: "power3.out",
+        overwrite: "auto",
+        y: -112,
+      });
+    };
+
+    const onLenisScroll = ({ direction, scroll }: LenisScrollPayload) => {
+      if (direction === 1 && scroll > 120) hideHeader();
+      if (direction === -1 || scroll < 80) showHeader();
+      lastScrollYRef.current = Math.max(scroll, 0);
     };
 
     const onScroll = () => {
@@ -326,16 +347,16 @@ export function HomeExperience() {
       if (event.deltaY < -4) showHeader();
     };
 
+    const lenis = (window as HomeWindow).__buywiseLenis;
+    lenis?.on?.("scroll", onLenisScroll);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("wheel", onWheel, { passive: true });
 
     return () => {
+      lenis?.off?.("scroll", onLenisScroll);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("wheel", onWheel);
-      hideY.tween.kill();
-      hideOpacity.tween.kill();
-      showY.tween.kill();
-      showOpacity.tween.kill();
+      gsap.killTweensOf(navShell);
     };
   }, [shouldReduceMotion]);
 
@@ -415,7 +436,7 @@ export function HomeExperience() {
         </motion.div>
       </header>
 
-      <section className="relative mx-auto flex min-h-screen max-w-7xl flex-col items-center overflow-hidden px-4 pt-36 text-center md:pt-44">
+      <section className="relative mx-auto flex min-h-screen max-w-7xl flex-col items-center overflow-x-clip px-4 pt-36 pb-20 text-center md:pt-44">
         <div
           data-hero-copy
           className="border-bw-border text-bw-muted inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-sm font-black shadow-sm backdrop-blur"
@@ -473,10 +494,10 @@ export function HomeExperience() {
         </p>
 
         <div
+          data-hero-fan
           data-hero-copy
-          className="relative mt-10 h-[22rem] w-full max-w-5xl overflow-hidden md:h-[26rem]"
+          className="relative mt-10 h-[30rem] w-full max-w-6xl overflow-visible md:h-[32rem]"
         >
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-bw-paper to-transparent" />
           {productCatalog.slice(0, 3).map((product, index) => {
             const theme = verdictTheme[product.verdict];
 
