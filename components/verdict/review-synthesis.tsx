@@ -31,7 +31,7 @@ export function ReviewSynthesis({ reviews }: ReviewSynthesisProps) {
             summaries, not direct quotes.
           </p>
         </div>
-        <span className="bg-bw-blue-soft text-primary flex size-12 items-center justify-center rounded-full">
+        <span className="bg-bw-paper text-primary flex size-12 items-center justify-center rounded-full">
           <Filter className="size-5" />
         </span>
       </div>
@@ -68,9 +68,9 @@ export function ReviewSynthesis({ reviews }: ReviewSynthesisProps) {
               <span
                 className={cn(
                   "rounded-full px-3 py-1 text-xs font-black",
-                  review.sentiment === "Positive" && "bg-bw-green-soft text-bw-green",
-                  review.sentiment === "Mixed" && "bg-bw-amber-soft text-bw-amber",
-                  review.sentiment === "Negative" && "bg-bw-red-soft text-bw-red"
+                  review.sentiment === "Positive" && "border-bw-border bg-white text-bw-green",
+                  review.sentiment === "Mixed" && "border-bw-border bg-white text-bw-amber",
+                  review.sentiment === "Negative" && "border-bw-border bg-white text-bw-red"
                 )}
               >
                 {review.sentiment}

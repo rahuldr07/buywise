@@ -8,37 +8,37 @@
 :root {
   --radius: 1.5rem;
 
-  --bw-paper: #fffaf0;
+  --bw-paper: #faf7ef;
   --bw-surface: #ffffff;
-  --bw-surface-raised: #fff4dd;
-  --bw-ink: #182019;
-  --bw-muted: #6d7169;
-  --bw-border: #eadfc8;
-  --bw-fog: #fff7e8;
+  --bw-surface-raised: #f8fafc;
+  --bw-ink: #0f172a;
+  --bw-muted: #64748b;
+  --bw-border: #e5e7eb;
+  --bw-fog: #f8fafc;
 
-  --bw-blue: #2867e8;
-  --bw-green: #23a866;
-  --bw-amber: #e99b22;
-  --bw-red: #d94f64;
-  --bw-violet: #7b5af7;
+  --bw-blue: #2563eb;
+  --bw-green: #10b981;
+  --bw-amber: #f59e0b;
+  --bw-red: #ef4444;
+  --bw-violet: #6d5dfb;
   --bw-coral: #f26b4f;
   --bw-mint: #8ee7bd;
 
-  --bw-blue-soft: #edf4ff;
-  --bw-green-soft: #eafaf1;
-  --bw-amber-soft: #fff1d2;
-  --bw-red-soft: #fff0f2;
-  --bw-violet-soft: #f4f0ff;
+  --bw-blue-soft: #eff6ff;
+  --bw-green-soft: #ecfdf5;
+  --bw-amber-soft: #fffbeb;
+  --bw-red-soft: #fef2f2;
+  --bw-violet-soft: #f5f3ff;
   --bw-coral-soft: #fff0ea;
 
   --bw-gradient-hero:
-    radial-gradient(circle at 18% 16%, rgba(255, 226, 142, 0.68), transparent 26rem),
-    linear-gradient(135deg, #fff7e5 0%, #ffffff 54%, #eef7ff 100%);
-  --bw-gradient-card: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(255, 247, 232, 0.82));
-  --bw-gradient-primary: linear-gradient(135deg, #182019 0%, #1f5ad7 48%, #23a866 100%);
-  --bw-gradient-warm: linear-gradient(135deg, #fff4d8 0%, #ffe7dc 46%, #edf4ff 100%);
-  --bw-shadow-soft: 0 12px 36px rgba(44, 37, 24, 0.08);
-  --bw-shadow-strong: 0 18px 60px rgba(40, 103, 232, 0.1);
+    radial-gradient(circle at 16% 8%, rgba(37, 99, 235, 0.1), transparent 24rem),
+    linear-gradient(135deg, #faf7ef 0%, #ffffff 58%, #f8fafc 100%);
+  --bw-gradient-card: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.92));
+  --bw-gradient-primary: linear-gradient(135deg, #0f172a 0%, #2563eb 100%);
+  --bw-gradient-warm: linear-gradient(135deg, #ffffff 0%, #faf7ef 56%, #f8fafc 100%);
+  --bw-shadow-soft: 0 12px 34px rgba(15, 23, 42, 0.06);
+  --bw-shadow-strong: 0 20px 70px rgba(15, 23, 42, 0.1);
 
   --background: var(--bw-paper);
   --foreground: var(--bw-ink);
@@ -52,20 +52,20 @@
   --primary: var(--bw-blue);
   --primary-foreground: #ffffff;
 
-  --secondary: #fff1d7;
+  --secondary: #f1f5f9;
   --secondary-foreground: var(--bw-ink);
 
-  --muted: #fff4dd;
+  --muted: #f1f5f9;
   --muted-foreground: var(--bw-muted);
 
-  --accent: #ecf8f1;
+  --accent: var(--bw-blue-soft);
   --accent-foreground: var(--bw-ink);
 
   --destructive: var(--bw-red);
   --destructive-foreground: #ffffff;
 
   --border: var(--bw-border);
-  --input: #d9cdb7;
+  --input: var(--bw-border);
   --ring: var(--bw-blue);
 
   --chart-1: var(--bw-blue);
@@ -82,14 +82,14 @@
   --card-foreground: var(--bw-ink);
   --popover: var(--bw-surface);
   --popover-foreground: var(--bw-ink);
-  --secondary: #fff1d7;
+  --secondary: #f1f5f9;
   --secondary-foreground: var(--bw-ink);
-  --muted: #fff4dd;
+  --muted: #f1f5f9;
   --muted-foreground: var(--bw-muted);
-  --accent: #ecf8f1;
+  --accent: var(--bw-blue-soft);
   --accent-foreground: var(--bw-ink);
   --border: var(--bw-border);
-  --input: #d9cdb7;
+  --input: var(--bw-border);
 }
 
 @theme inline {
@@ -183,10 +183,10 @@ html {
 body {
   min-height: 100vh;
   background:
-    linear-gradient(rgba(24, 32, 25, 0.034) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(24, 32, 25, 0.034) 1px, transparent 1px),
-    radial-gradient(circle at 8% 0%, rgba(255, 221, 138, 0.32), transparent 26rem),
-    linear-gradient(180deg, #fffaf0 0%, #fffdf8 58%, #edf8ff 100%);
+    linear-gradient(rgba(15, 23, 42, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.028) 1px, transparent 1px),
+    radial-gradient(circle at 8% 0%, rgba(37, 99, 235, 0.08), transparent 26rem),
+    linear-gradient(180deg, #faf7ef 0%, #fffdf8 58%, #f8fafc 100%);
   background-size:
     64px 64px,
     64px 64px,

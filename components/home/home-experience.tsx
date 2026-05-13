@@ -12,18 +12,15 @@ import {
   BellRing,
   Camera,
   CheckCircle2,
-  Link2,
   LockKeyhole,
-  ScanBarcode,
   Search,
   ShieldCheck,
   Sparkles,
   Star,
-  TrendingDown,
   WandSparkles,
-  Zap,
 } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
+import { popularCategories } from "@/lib/buywise-demo-data";
 import { demoProduct, productCatalog } from "@/lib/demo-product";
 import { cn, formatPrice } from "@/lib/utils";
 import { verdictTheme } from "@/lib/verdict-theme";
@@ -32,31 +29,24 @@ import type { ProductVerdict, Verdict } from "@/types/product";
 
 gsap.registerPlugin(useGSAP);
 
-const inputModes = [
-  { label: "Link", icon: Link2 },
-  { label: "Search", icon: Search },
-  { label: "Barcode", icon: ScanBarcode },
-  { label: "Image", icon: Camera },
-] as const;
-
 const offerCards = [
   {
     eyebrow: "buy what you",
     title: "need",
     body: "Daily essentials, tech, appliances, home gear.",
-    tone: "bg-bw-green-soft",
+    tone: "bg-white",
   },
   {
     eyebrow: "buy what you",
     title: "love",
     body: "Headphones, cameras, sneakers, beauty, hobbies.",
-    tone: "bg-bw-blue-soft",
+    tone: "bg-white",
   },
   {
     eyebrow: "skip what you",
     title: "shouldn't",
     body: "Bad timing, weak trust signals, and noisy hype.",
-    tone: "bg-bw-amber-soft",
+    tone: "bg-white",
   },
 ] as const;
 
@@ -116,11 +106,13 @@ const trustRules = [
   { icon: BellRing, label: "Affiliate disclosure stays near buy flows" },
 ] as const;
 
-const heroFanStyles = [
-  "left-[3%] top-16 -rotate-8",
-  "left-1/2 top-0 z-20 -translate-x-1/2 scale-110",
-  "right-[3%] top-16 rotate-8",
+const heroStackPositions = [
+  "md:absolute md:left-[4%] md:top-[2.5rem] md:z-10 md:w-[16rem] lg:w-[18.5rem] xl:w-[20rem]",
+  "md:absolute md:left-1/2 md:top-0 md:z-20 md:w-[19rem] md:-translate-x-1/2 lg:w-[21rem] xl:w-[23rem]",
+  "md:absolute md:right-[4%] md:top-[2.5rem] md:z-10 md:w-[16rem] lg:w-[18.5rem] xl:w-[20rem]",
 ] as const;
+
+const heroStackBaseRotation = [-7, 0, 7] as const;
 
 type LenisScrollPayload = {
   direction: -1 | 0 | 1;
@@ -197,75 +189,10 @@ function findBestProduct(query: string) {
   }, demoProduct);
 }
 
-function compactReviewCount(count: number) {
-  return count >= 1000 ? `${(count / 1000).toFixed(1)}k` : String(count);
-}
-
-function getProof(product: ProductVerdict) {
-  return [
-    { label: "AI Buy Score", value: product.aiBuyScore },
-    { label: "Confidence", value: `${product.confidenceScore}%` },
-    { label: "Reviews scanned", value: compactReviewCount(product.reviewCount) },
-  ] as const;
-}
-
-function getHeroInsights(product: ProductVerdict) {
-  const prices = product.priceHistory.map((point) => point.price);
-  const low = Math.min(...prices);
-  const high = Math.max(...prices);
-  const firstAlternative = product.alternatives[0];
-
-  return [
-    {
-      label: "Top review source",
-      value: product.reviewInsights
-        .slice(0, 2)
-        .map((review) => review.source)
-        .join(" + "),
-      tone: "bg-bw-blue-soft",
-    },
-    {
-      label: "Price window",
-      value: `${formatPrice(low, product.currency)} low / ${formatPrice(high, product.currency)} high`,
-      tone: "bg-bw-amber-soft",
-    },
-    {
-      label: "Next action",
-      value: firstAlternative ? `Compare ${firstAlternative.name.split(" ").slice(0, 2).join(" ")}` : "Open report",
-      tone: "bg-bw-green-soft",
-    },
-  ] as const;
-}
-
-function getLiveSignals(product: ProductVerdict) {
-  const prices = product.priceHistory.map((point) => point.price);
-  const low = Math.min(...prices);
-  const high = Math.max(...prices);
-
-  return [
-    {
-      label: "Price pulse",
-      value: `${formatPrice(low, product.currency)}-${formatPrice(high, product.currency)} range`,
-      tone: "bg-bw-amber-soft",
-      dot: "bg-bw-amber",
-    },
-    {
-      label: "Review signal",
-      value: `${product.reviewRating} rating, ${compactReviewCount(product.reviewCount)} read`,
-      tone: "bg-bw-blue-soft",
-      dot: "bg-bw-blue",
-    },
-    {
-      label: "Trust check",
-      value: `${product.retailer} verified`,
-      tone: "bg-bw-green-soft",
-      dot: "bg-bw-green",
-    },
-  ] as const;
-}
-
 export function HomeExperience() {
   const scopeRef = useRef<HTMLElement>(null);
+  const heroStackRef = useRef<HTMLDivElement>(null);
+  const heroCardRefs = useRef<Array<HTMLDivElement | null>>([]);
   const navShellRef = useRef<HTMLDivElement>(null);
   const lastScrollYRef = useRef(0);
   const navHiddenRef = useRef(false);
@@ -273,26 +200,9 @@ export function HomeExperience() {
   const scrollTo = useLenisScroll();
   const shouldReduceMotion = useReducedMotion();
   const [searchQuery, setSearchQuery] = useState(demoProduct.name);
-  const [selectedMode, setSelectedMode] = useState<(typeof inputModes)[number]["label"]>("Link");
-  const [activeSignal, setActiveSignal] = useState(0);
+  const [hoveredHeroIndex, setHoveredHeroIndex] = useState<number | null>(null);
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const matchedProduct = findBestProduct(deferredSearchQuery);
-  const proof = getProof(matchedProduct);
-  const heroInsights = getHeroInsights(matchedProduct);
-  const liveSignals = getLiveSignals(matchedProduct);
-  const signalCount = liveSignals.length;
-  const alternative = matchedProduct.alternatives[0];
-  const verdict = verdictTheme[matchedProduct.verdict];
-
-  useEffect(() => {
-    if (shouldReduceMotion) return;
-
-    const interval = window.setInterval(() => {
-      setActiveSignal((current) => (current + 1) % signalCount);
-    }, 1800);
-
-    return () => window.clearInterval(interval);
-  }, [shouldReduceMotion, signalCount]);
 
   useEffect(() => {
     const navShell = navShellRef.current;
@@ -369,12 +279,112 @@ export function HomeExperience() {
     () => {
       if (shouldReduceMotion) return;
 
+      const showcaseStage = heroStackRef.current;
+      const showcaseCards = heroCardRefs.current.filter(
+        (card): card is HTMLDivElement => card !== null
+      );
+
+      showcaseCards.forEach((card, index) => {
+        gsap.set(card, {
+          rotate: heroStackBaseRotation[index as 0 | 1 | 2],
+          transformOrigin: "50% 58%",
+        });
+      });
+
       gsap
         .timeline({ defaults: { duration: 0.55, ease: "power3.out" } })
         .from("[data-nav-shell]", { y: -14, autoAlpha: 0 })
         .from("[data-hero-copy]", { y: 24, autoAlpha: 0, stagger: 0.06 }, "-=0.18")
-        .from("[data-product-stage]", { y: 26, autoAlpha: 0 }, "-=0.26")
-        .from("[data-soft-card]", { y: 16, autoAlpha: 0, stagger: 0.05 }, "-=0.22");
+        .from("[data-hero-stack]", { y: 28, autoAlpha: 0, scale: 0.985 }, "-=0.2")
+        .from(
+          showcaseCards,
+          {
+            y: (index) => (index === 1 ? 38 : 54),
+            autoAlpha: 0,
+            rotate: (index) => heroStackBaseRotation[index as 0 | 1 | 2],
+            stagger: 0.08,
+            duration: 0.78,
+            ease: "power4.out",
+          },
+          "-=0.26"
+        );
+
+      gsap.to("[data-hero-stack-glow]", {
+        opacity: 0.92,
+        scale: 1.05,
+        duration: 4.8,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+      });
+
+      if (!showcaseStage || showcaseCards.length === 0) return;
+
+      const xSetters = showcaseCards.map((card) =>
+        gsap.quickTo(card, "x", { duration: 0.65, ease: "power3.out" })
+      );
+      const ySetters = showcaseCards.map((card) =>
+        gsap.quickTo(card, "y", { duration: 0.65, ease: "power3.out" })
+      );
+      const rotateSetters = showcaseCards.map((card) =>
+        gsap.quickTo(card, "rotate", { duration: 0.65, ease: "power3.out" })
+      );
+      const scaleSetters = showcaseCards.map((card) =>
+        gsap.quickTo(card, "scale", { duration: 0.45, ease: "power3.out" })
+      );
+
+      const setShowcaseDepth = (activeIndex: number | null) => {
+        showcaseCards.forEach((card, index) => {
+          card.parentElement?.style.setProperty(
+            "z-index",
+            String(activeIndex === index ? 45 : index === 1 ? 20 : 10)
+          );
+        });
+      };
+
+      const onPointerMove = (event: PointerEvent) => {
+        const bounds = showcaseStage.getBoundingClientRect();
+        const offsetX = (event.clientX - bounds.left) / bounds.width - 0.5;
+        const offsetY = (event.clientY - bounds.top) / bounds.height - 0.5;
+        let activeIndex: number | null = null;
+
+        showcaseCards.forEach((card, index) => {
+          const depth = index === 1 ? 0.65 : 1;
+          const cardBounds = card.getBoundingClientRect();
+          const isPointerOnCard =
+            event.clientX >= cardBounds.left - 12 &&
+            event.clientX <= cardBounds.right + 12 &&
+            event.clientY >= cardBounds.top - 12 &&
+            event.clientY <= cardBounds.bottom + 12;
+
+          if (isPointerOnCard) activeIndex = index;
+
+          xSetters[index](offsetX * 26 * depth);
+          ySetters[index](offsetY * 12 * depth + (isPointerOnCard ? -12 : 0));
+          rotateSetters[index](heroStackBaseRotation[index as 0 | 1 | 2] + offsetX * 5 * depth);
+          scaleSetters[index](isPointerOnCard ? (index === 1 ? 1.045 : 1.075) : 1);
+        });
+
+        setShowcaseDepth(activeIndex);
+      };
+
+      const onPointerLeave = () => {
+        showcaseCards.forEach((_, index) => {
+          xSetters[index](0);
+          ySetters[index](0);
+          rotateSetters[index](heroStackBaseRotation[index as 0 | 1 | 2]);
+          scaleSetters[index](1);
+        });
+        setShowcaseDepth(null);
+      };
+
+      showcaseStage.addEventListener("pointermove", onPointerMove);
+      showcaseStage.addEventListener("pointerleave", onPointerLeave);
+
+      return () => {
+        showcaseStage.removeEventListener("pointermove", onPointerMove);
+        showcaseStage.removeEventListener("pointerleave", onPointerLeave);
+      };
     },
     { scope: scopeRef, dependencies: [shouldReduceMotion] }
   );
@@ -388,7 +398,7 @@ export function HomeExperience() {
         <motion.div
           ref={navShellRef}
           data-nav-shell
-          className="border-bw-border flex h-[4.75rem] items-center justify-between rounded-full border bg-white/94 px-3 shadow-[0_18px_50px_rgba(44,37,24,0.12)] backdrop-blur-xl will-change-transform md:px-5"
+          className="border-bw-border flex h-[4.75rem] items-center justify-between rounded-full border bg-white/94 px-3 shadow-[0_16px_44px_rgba(15,23,42,0.08)] backdrop-blur-xl will-change-transform md:px-5"
           initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
@@ -420,14 +430,14 @@ export function HomeExperience() {
           <div className="flex items-center gap-2">
             <Link
               className="bg-bw-fog text-bw-ink hidden h-12 items-center rounded-full px-6 text-sm font-black transition hover:bg-bw-border sm:inline-flex"
-              href="/watchlist"
+              href="/account"
             >
-              Login
+              Sign in
             </Link>
             <button
-              className="bg-bw-amber text-bw-ink inline-flex h-12 items-center gap-3 rounded-full px-6 text-sm font-black shadow-[0_12px_28px_rgba(244,169,27,0.24)] transition hover:-translate-y-0.5 hover:bg-bw-amber/90"
+              className="bg-primary inline-flex h-12 items-center gap-3 rounded-full px-6 text-sm font-black text-white shadow-[0_12px_28px_rgba(37,99,235,0.22)] transition hover:-translate-y-0.5 hover:bg-primary/90"
               type="button"
-              onClick={() => scrollTo("#checker")}
+              onClick={() => scrollTo("#products")}
             >
               Get started
               <ArrowRight className="size-4" />
@@ -436,7 +446,7 @@ export function HomeExperience() {
         </motion.div>
       </header>
 
-      <section className="relative mx-auto flex min-h-[calc(100vh-2rem)] max-w-7xl flex-col items-center overflow-x-clip px-4 pt-36 pb-10 text-center md:pt-44 md:pb-12">
+      <section className="relative mx-auto flex min-h-[calc(100vh-2rem)] max-w-7xl flex-col items-center overflow-x-clip px-4 pt-28 pb-8 text-center md:pt-30 md:pb-10">
         <div
           data-hero-copy
           className="border-bw-border text-bw-muted inline-flex items-center gap-2 rounded-full border bg-white/80 px-4 py-2 text-sm font-black shadow-sm backdrop-blur"
@@ -447,7 +457,7 @@ export function HomeExperience() {
 
         <h1
           data-hero-copy
-          className="font-display text-bw-ink mt-8 max-w-6xl text-5xl leading-[0.98] font-black tracking-[-0.06em] md:text-7xl xl:text-[5.8rem]"
+          className="font-display text-bw-ink mt-5 max-w-6xl text-5xl leading-[0.98] font-black tracking-[-0.06em] md:text-[4.2rem] xl:text-[4.35rem]"
         >
           Know what to buy from{" "}
           <span className="font-serif font-normal tracking-[-0.08em] italic">
@@ -457,7 +467,7 @@ export function HomeExperience() {
 
         <p
           data-hero-copy
-          className="text-bw-muted mt-7 max-w-3xl text-base leading-8 font-medium md:text-lg"
+          className="text-bw-muted mt-4 max-w-3xl text-base leading-7 font-medium md:text-lg"
         >
           IsItABuy reads price history, review quality, retailer trust, and alternatives before
           checkout. Search naturally, paste a link, or start with a product photo.
@@ -465,7 +475,7 @@ export function HomeExperience() {
 
         <form
           data-hero-copy
-          className="border-bw-amber/50 mt-9 grid w-full max-w-[46rem] grid-cols-[1fr_auto] items-center rounded-full border bg-white p-2 shadow-[0_18px_45px_rgba(44,37,24,0.1)]"
+          className="border-bw-border mt-5 grid w-full max-w-[46rem] grid-cols-[1fr_auto] items-center rounded-full border bg-white p-2 shadow-[0_18px_45px_rgba(15,23,42,0.08)]"
           onSubmit={onHeroSearch}
         >
           <label className="relative min-w-0">
@@ -474,13 +484,12 @@ export function HomeExperience() {
               className="text-bw-ink placeholder:text-bw-muted/70 h-12 w-full rounded-full bg-transparent pr-3 pl-12 text-sm font-bold outline-none md:text-base"
               name="q"
               onChange={(event) => setSearchQuery(event.target.value)}
-              onFocus={() => setSelectedMode("Search")}
               placeholder="Paste a product link or search iPhone, headphones, shoes..."
               value={searchQuery}
             />
           </label>
           <button
-            className="bg-bw-amber text-bw-ink inline-flex h-12 items-center justify-center gap-3 rounded-full px-5 text-sm font-black transition hover:-translate-y-0.5 hover:bg-bw-amber/90 md:px-7"
+            className="bg-primary inline-flex h-12 items-center justify-center gap-3 rounded-full px-5 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-primary/90 md:px-7"
             type="submit"
           >
             Check for free
@@ -488,315 +497,187 @@ export function HomeExperience() {
           </button>
         </form>
 
-        <p data-hero-copy className="text-bw-muted mt-7 text-sm font-medium">
-          Trusted for <span className="font-black">{compactReviewCount(matchedProduct.reviewCount)}</span>{" "}
-          review signals, commission-neutral verdicts, and no-login basic checks.
-        </p>
-
         <div
-          data-hero-fan
-          data-hero-copy
-          className="relative mt-9 h-[26rem] w-full max-w-6xl overflow-visible md:h-[28rem]"
+          ref={heroStackRef}
+          data-hero-stack
+          className="relative mt-3 w-full max-w-[74rem] px-3 pb-4 md:h-[28rem] md:px-8"
         >
+          <div
+            data-hero-stack-glow
+            className="pointer-events-none absolute inset-x-[12%] top-14 h-48 rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.1),transparent_68%)] blur-3xl"
+          />
+          <div className="pointer-events-none absolute inset-x-[8%] top-8 h-px bg-gradient-to-r from-transparent via-bw-border/80 to-transparent" />
+
           {productCatalog.slice(0, 3).map((product, index) => {
             const theme = verdictTheme[product.verdict];
 
             return (
-              <motion.article
+              <div
                 key={product.slug}
                 className={cn(
-                  "border-bw-border absolute w-[17rem] overflow-hidden rounded-[2rem] border bg-white p-3 text-left shadow-[0_30px_80px_rgba(44,37,24,0.16)] md:w-[21rem]",
-                  heroFanStyles[index]
+                  "relative mx-auto w-full max-w-sm",
+                  heroStackPositions[index]
                 )}
-                animate={
-                  shouldReduceMotion
-                    ? undefined
-                    : { y: index === 1 ? [0, -8, 0] : [0, 6, 0] }
-                }
-                transition={{ duration: 5 + index, repeat: Infinity, ease: "easeInOut" }}
+                style={{ zIndex: hoveredHeroIndex === index ? 40 : index === 1 ? 20 : 10 }}
               >
-                <div className="relative h-48 overflow-hidden rounded-[1.45rem] bg-bw-fog md:h-60">
-                  <Image
-                    alt={product.name}
-                    className="h-full w-full object-cover"
-                    height={420}
-                    priority={index === 1}
-                    src={product.imageUrl}
-                    width={520}
-                  />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 to-transparent p-4 text-white">
-                    <p className="text-[0.65rem] font-black tracking-[0.18em] uppercase opacity-80">
-                      Product check
-                    </p>
-                    <h2 className="font-display mt-1 line-clamp-2 text-xl leading-tight font-black">
-                      {product.name}
-                    </h2>
-                  </div>
+                <div
+                  ref={(node) => {
+                    heroCardRefs.current[index] = node;
+                  }}
+                  data-hero-showcase-card
+                  className="relative"
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  <motion.div
+                    className="group relative will-change-transform"
+                    onMouseEnter={() => setHoveredHeroIndex(index)}
+                    onMouseLeave={() => setHoveredHeroIndex(null)}
+                    onMouseMove={() => setHoveredHeroIndex(index)}
+                    onHoverEnd={() => setHoveredHeroIndex(null)}
+                    onHoverStart={() => setHoveredHeroIndex(index)}
+                    style={{ transformStyle: "preserve-3d" }}
+                    transition={spring}
+                  >
+                    <Link
+                      className="block"
+                      href={`/product/${product.slug}`}
+                      onBlur={() => setHoveredHeroIndex(null)}
+                      onFocus={() => setHoveredHeroIndex(index)}
+                    >
+                      <div
+                        className={cn(
+                          "relative overflow-hidden rounded-[2.35rem] bg-black transition-[box-shadow] duration-300",
+                          hoveredHeroIndex === index
+                            ? "shadow-[0_48px_120px_rgba(44,37,24,0.34)] ring-2 ring-bw-blue/35"
+                            : "shadow-[0_28px_70px_rgba(44,37,24,0.2)] ring-1 ring-white/65"
+                        )}
+                      >
+                        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/16 to-transparent" />
+                        <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between p-5">
+                          <span className="rounded-full bg-white/[0.88] px-3 py-1 text-[0.65rem] font-black tracking-[0.2em] uppercase text-bw-ink backdrop-blur">
+                            Product check
+                          </span>
+                          <span className="rounded-full bg-black/[0.18] px-3 py-1 text-[0.65rem] font-black tracking-[0.18em] uppercase text-white backdrop-blur">
+                            {product.category}
+                          </span>
+                        </div>
+
+                        <motion.div
+                          className="relative h-[20rem] overflow-hidden md:h-[24rem]"
+                          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                          whileHover={shouldReduceMotion ? undefined : { scale: 1.075 }}
+                        >
+                          <Image
+                            alt={product.name}
+                            className="h-full w-full object-cover"
+                            height={620}
+                            priority={index === 1}
+                            src={product.imageUrl}
+                            width={520}
+                          />
+                        </motion.div>
+
+                        <div className="absolute inset-x-0 bottom-0 z-20 p-5 text-white">
+                          <div className="flex items-end justify-between gap-4">
+                            <div className="min-w-0">
+                              <h2 className="font-display line-clamp-3 max-w-[14ch] text-[1.75rem] leading-[0.95] font-black tracking-[-0.055em] md:text-[2rem]">
+                                {product.name}
+                              </h2>
+                              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-black">
+                                <span
+                                  className={cn(
+                                    "inline-flex rounded-full px-3 py-1.5 shadow-sm",
+                                    theme.soft
+                                  )}
+                                >
+                                  {shortHeroVerdict(product.verdict)}
+                                </span>
+                                <span className="rounded-full border border-white/[0.14] bg-white/10 px-3 py-1.5 text-white/[0.92] backdrop-blur">
+                                  {formatPrice(product.currentPrice, product.currency)}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="shrink-0 text-right">
+                              <p className="text-[0.65rem] font-black tracking-[0.2em] uppercase text-white/70">
+                                Score
+                              </p>
+                              <p className="font-display text-5xl leading-none font-black">
+                                {product.aiBuyScore}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
                 </div>
-                <div className="mt-3 flex items-center justify-between gap-3">
-                  <span className={cn("rounded-full px-3 py-1 text-xs font-black", theme.soft)}>
-                    {product.verdict}
-                  </span>
-                  <span className="font-display text-bw-ink text-2xl font-black">
-                    {product.aiBuyScore}
-                  </span>
-                </div>
-              </motion.article>
+              </div>
             );
           })}
         </div>
       </section>
 
-      <section id="checker" className="mx-auto max-w-7xl px-4 py-10">
-        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="border-bw-border rounded-[2rem] border bg-white p-5 shadow-[0_18px_50px_rgba(44,37,24,0.08)] md:p-7">
-            <p className="text-primary text-sm font-black">Get started</p>
-            <h2 className="font-display text-bw-ink mt-3 text-4xl leading-tight font-black md:text-5xl">
-              Search once. Get the cleanest buying decision.
-            </h2>
-            <p className="text-bw-muted mt-4 text-base leading-7 font-medium">
-              The hero search supports fuzzy matching. Typing “iphone”, “sony”, or “nike” switches
-              the demo report instantly before opening the full product page.
-            </p>
+      <section className="mx-auto grid max-w-7xl gap-4 px-4 py-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <article className="border-bw-border rounded-[2rem] border bg-white p-6 shadow-[0_12px_36px_rgba(15,23,42,0.05)]">
+          <p className="text-primary text-sm font-black">Core promise</p>
+          <h2 className="font-display mt-3 text-3xl font-black text-bw-ink md:text-4xl">
+            One clear verdict before checkout.
+          </h2>
+          <div className="mt-5 grid gap-2 sm:grid-cols-4">
+            {verdictCards.map((card) => {
+              const theme = verdictTheme[card.verdict];
 
-            <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {inputModes.map((mode) => {
-                const Icon = mode.icon;
-                const active = selectedMode === mode.label;
-
-                return (
-                  <motion.button
-                    key={mode.label}
-                    className={cn(
-                      "flex h-12 items-center justify-center gap-2 rounded-full border text-sm font-black transition",
-                      active
-                        ? "border-primary/40 text-primary bg-bw-blue-soft shadow-sm"
-                        : "border-bw-border text-bw-muted hover:text-bw-ink bg-white"
-                    )}
-                    onClick={() => setSelectedMode(mode.label)}
-                    type="button"
-                    whileHover={shouldReduceMotion ? undefined : { y: -2 }}
-                    transition={spring}
-                  >
-                    <Icon className="size-4" />
-                    {mode.label}
-                  </motion.button>
-                );
-              })}
-            </div>
-
-            <form className="mt-4 grid gap-3 md:grid-cols-[1fr_auto]" onSubmit={onHeroSearch}>
-              <label className="relative">
-                <Search className="text-bw-muted absolute top-1/2 left-4 size-5 -translate-y-1/2" />
-                <input
-                  className="border-bw-border text-bw-ink placeholder:text-bw-muted/70 focus:border-primary focus:ring-primary/10 h-[3.75rem] w-full rounded-full border bg-white pr-4 pl-12 text-base font-bold transition outline-none focus:ring-4"
-                  name="checker-search"
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  onFocus={() => setSelectedMode("Search")}
-                  placeholder="Try iPhone, Sony headphones, Nike shoes"
-                  value={searchQuery}
-                />
-              </label>
-              <button
-                className="bg-primary inline-flex h-[3.75rem] items-center justify-center gap-2 rounded-full px-6 text-sm font-black text-white shadow-[0_12px_28px_rgba(40,103,232,0.22)] transition hover:-translate-y-0.5 hover:bg-primary/90"
-                type="submit"
-              >
-                Analyze
-                <Zap className="size-4 text-white" />
-              </button>
-            </form>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              {proof.map((item) => (
-                <div key={item.label} className="border-bw-border rounded-[1.35rem] border bg-bw-paper p-4">
-                  <p className="text-bw-muted text-xs font-black">{item.label}</p>
-                  <p className="font-display text-bw-ink mt-1 text-2xl font-black">{item.value}</p>
+              return (
+                <div key={card.verdict} className="border-bw-border rounded-[1.25rem] border bg-white p-3">
+                  <span className={cn("rounded-full px-3 py-1 text-xs font-black", theme.badge)}>
+                    {card.verdict === "Better Alternative Available" ? "Alternative" : card.verdict}
+                  </span>
+                  <p className="mt-3 text-sm leading-5 font-bold text-bw-muted">{card.body}</p>
                 </div>
-              ))}
-            </div>
-
-            <div className="mt-4 grid gap-2">
-              {heroInsights.map((item) => (
-                <div
-                  key={item.label}
-                  className={cn(
-                    "border-bw-border flex items-center justify-between gap-4 rounded-full border px-4 py-3 shadow-sm",
-                    item.tone
-                  )}
-                >
-                  <span className="text-bw-muted text-xs font-black">{item.label}</span>
-                  <span className="text-bw-ink text-sm font-black">{item.value}</span>
-                </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
+        </article>
 
-          <div
-            data-product-stage
-            className="border-bw-border overflow-hidden rounded-[2rem] border bg-[linear-gradient(135deg,#f8fbff,#ecfff4)] p-4 shadow-[0_18px_50px_rgba(44,37,24,0.08)]"
+        <article className="border-bw-border rounded-[2rem] border bg-white p-6 shadow-[0_12px_36px_rgba(15,23,42,0.05)]">
+          <p className="text-primary text-sm font-black">Chrome extension</p>
+          <h2 className="font-display mt-3 text-3xl font-black text-bw-ink">
+            Check products from the retailer page.
+          </h2>
+          <p className="mt-4 text-sm leading-6 font-medium text-bw-muted">
+            Extension install is staged for Phase 1. The CTA shows where checkout-adjacent buying
+            guidance will live.
+          </p>
+          <Link
+            className="mt-5 inline-flex h-12 items-center rounded-full bg-primary px-5 text-sm font-black text-white shadow-[0_12px_28px_rgba(40,103,232,0.2)] transition hover:-translate-y-0.5"
+            href="/account"
           >
-            <div className="grid gap-4 md:grid-cols-[1fr_0.85fr]">
-              <Link
-                data-soft-card
-                className="border-bw-border group relative block h-full overflow-hidden rounded-[1.5rem] border bg-white p-3"
-                href={`/product/${matchedProduct.slug}`}
-              >
-                <div className="relative h-full min-h-[23rem] overflow-hidden rounded-[1.15rem] bg-bw-fog md:min-h-[24rem]">
-                  <Image
-                    alt={matchedProduct.name}
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
-                    height={580}
-                    loading="eager"
-                    src={matchedProduct.imageUrl}
-                    width={760}
-                  />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 to-transparent p-5 text-white">
-                    <p className="text-xs font-black tracking-[0.18em] uppercase opacity-80">
-                      Matched product
-                    </p>
-                    <h2 className="font-display mt-2 max-w-md text-3xl leading-tight font-black">
-                      {matchedProduct.name}
-                    </h2>
-                  </div>
-                </div>
-              </Link>
+            Join extension waitlist
+            <ArrowRight className="ml-2 size-4" />
+          </Link>
+        </article>
+      </section>
 
-              <div className="grid gap-4">
-                <div data-soft-card className="border-bw-border rounded-[1.5rem] border bg-white p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-bw-muted text-xs font-black">AI score</p>
-                      <p className="font-display text-bw-ink mt-1 text-5xl font-black">
-                        {matchedProduct.aiBuyScore}
-                      </p>
-                    </div>
-                    <span className={cn("inline-flex rounded-full px-3 py-1 text-xs font-black", verdict.soft)}>
-                      {matchedProduct.verdict}
-                    </span>
-                  </div>
-                  <p className="text-bw-muted mt-3 text-sm leading-6 font-medium">
-                    {matchedProduct.verdictReason}
-                  </p>
-                </div>
-
-                <div
-                  data-soft-card
-                  className={cn(
-                    "overflow-hidden rounded-[1.5rem] border p-3",
-                    alternative
-                      ? "border-bw-green/20 bg-bw-green-soft"
-                      : "border-bw-border bg-white"
-                  )}
-                >
-                  <div className="flex items-stretch gap-3">
-                    <div className="border-bw-border relative h-28 w-28 shrink-0 overflow-hidden rounded-[1rem] border bg-white">
-                      <Image
-                        alt={alternative?.name ?? matchedProduct.name}
-                        className="h-full w-full object-cover"
-                        height={240}
-                        src={alternative?.imageUrl ?? matchedProduct.imageUrl}
-                        width={240}
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <BadgeCheck className="text-bw-green size-5 shrink-0" />
-                        <p className="text-bw-ink font-black">
-                          {alternative ? "Alternative found" : "No better alternative"}
-                        </p>
-                      </div>
-                      <p className="text-bw-muted mt-1 text-sm leading-5 font-medium">
-                        {alternative
-                          ? `${alternative.name} at ${formatPrice(alternative.price, matchedProduct.currency)}.`
-                          : "Current product is the best demo match for this search."}
-                      </p>
-                      {alternative ? (
-                        <div className="mt-3 flex items-center justify-between gap-3 rounded-full bg-white/75 px-3 py-1.5">
-                          <span className="text-bw-muted text-xs font-black">Alt score</span>
-                          <span className="font-display text-bw-green text-lg font-black">
-                            {alternative.aiBuyScore}
-                          </span>
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
-
-                <div data-soft-card className="border-bw-border rounded-[1.5rem] border bg-white p-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <TrendingDown className="text-bw-amber size-5" />
-                      <p className="text-bw-ink font-black">Signal breakdown</p>
-                    </div>
-                    <span className="text-bw-muted text-xs font-black">
-                      {matchedProduct.confidenceScore}% confidence
-                    </span>
-                  </div>
-                  <div className="mt-3 grid grid-cols-3 gap-2">
-                    {matchedProduct.scores.slice(0, 3).map((score) => (
-                      <div key={score.id} className="rounded-[1rem] bg-bw-paper p-2.5">
-                        <p className="text-bw-muted text-xs font-black">
-                          {shortHeroScore(score.label)}
-                        </p>
-                        <p className="font-display text-bw-ink mt-1 text-xl font-black">
-                          {score.score}
-                        </p>
-                        <div className="bg-bw-border mt-2 h-1 overflow-hidden rounded-full">
-                          <div
-                            className="bg-bw-green h-full rounded-full"
-                            style={{ width: `${score.score}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div data-soft-card className="border-bw-border bg-bw-blue-soft rounded-[1.5rem] border p-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-primary text-xs font-black">Review read</p>
-                      <p className="text-bw-ink mt-1 text-sm leading-5 font-black">
-                        {matchedProduct.reviewInsights[0]?.source ?? matchedProduct.retailer} says{" "}
-                        {matchedProduct.reviewInsights[0]?.sentiment.toLowerCase() ?? "positive"}.
-                      </p>
-                    </div>
-                    <span className="font-display text-primary text-2xl font-black">
-                      {matchedProduct.reviewRating}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              {liveSignals.map((signal, index) => (
-                <button
-                  key={signal.label}
-                  className={cn(
-                    "rounded-[1.25rem] border px-4 py-3 text-left transition",
-                    activeSignal === index
-                      ? `${signal.tone} border-bw-border bw-live-slide`
-                      : "border-white/80 bg-white/70"
-                  )}
-                  type="button"
-                  onClick={() => setActiveSignal(index)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={cn(
-                        "size-2 rounded-full",
-                        signal.dot,
-                        activeSignal === index && "bw-breathe"
-                      )}
-                    />
-                    <p className="text-bw-muted text-xs font-black">{signal.label}</p>
-                  </div>
-                  <p className="text-bw-ink mt-1 text-sm font-black">{signal.value}</p>
-                </button>
-              ))}
-            </div>
-          </div>
+      <section className="mx-auto grid max-w-7xl gap-4 px-4 py-4 lg:grid-cols-[0.9fr_1.1fr]">
+        <article className="border-bw-border rounded-[2rem] border bg-white p-6 shadow-[0_12px_36px_rgba(15,23,42,0.04)]">
+          <p className="text-bw-green text-sm font-black">Commission-neutral trust</p>
+          <p className="mt-3 text-base leading-7 font-medium text-bw-muted">
+            BuyWise may earn from some affiliate links, but scores and rankings are based on price,
+            trust, review quality, and alternatives, not commission.
+          </p>
+        </article>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {popularCategories.map((category) => (
+            <Link
+              key={category.label}
+              className="border-bw-border rounded-[1.5rem] border bg-white p-4 transition hover:-translate-y-1 hover:shadow-[0_12px_36px_rgba(15,23,42,0.07)]"
+              href={category.href}
+            >
+              <p className="font-display text-xl font-black text-bw-ink">{category.label}</p>
+              <p className="mt-2 text-sm font-bold text-bw-muted">{category.count}</p>
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -835,7 +716,7 @@ export function HomeExperience() {
             return (
               <motion.article
                 key={product.slug}
-                className="border-bw-border overflow-hidden rounded-[2rem] border bg-white shadow-[0_10px_30px_rgba(44,37,24,0.06)]"
+                className="border-bw-border overflow-hidden rounded-[2rem] border bg-white shadow-[0_10px_30px_rgba(15,23,42,0.05)]"
                 transition={spring}
                 whileHover={shouldReduceMotion ? undefined : { y: -5 }}
               >
@@ -863,7 +744,7 @@ export function HomeExperience() {
                   </h3>
                   <div className="text-bw-muted mt-3 flex items-center gap-2 text-sm font-bold">
                     <Star className="text-bw-amber size-4 fill-current" />
-                    {product.reviewRating} rating ·{" "}
+                    {product.reviewRating} rating -{" "}
                     {formatPrice(product.currentPrice, product.currency)}
                   </div>
                   <Link
@@ -931,7 +812,7 @@ export function HomeExperience() {
             return (
               <motion.article
                 key={card.verdict}
-                className={cn("rounded-[2rem] border bg-white p-5", theme.tint)}
+                className="border-bw-border rounded-[2rem] border bg-white p-5 shadow-[0_10px_30px_rgba(15,23,42,0.04)]"
                 transition={spring}
                 whileHover={shouldReduceMotion ? undefined : { y: -5 }}
               >
@@ -954,7 +835,7 @@ export function HomeExperience() {
       </section>
 
       <section id="pricing" className="mx-auto max-w-7xl px-4 py-14">
-        <div className="border-bw-border rounded-[2.25rem] border bg-white p-5 shadow-[0_18px_50px_rgba(44,37,24,0.06)] md:p-7">
+        <div className="border-bw-border rounded-[2.25rem] border bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.05)] md:p-7">
           <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
             <div>
               <p className="text-primary text-sm font-black">Pricing</p>
@@ -984,7 +865,7 @@ export function HomeExperience() {
       </section>
 
       <section id="trust" className="mx-auto max-w-7xl px-4 pb-16">
-        <div className="border-bw-border rounded-[2.25rem] border bg-[linear-gradient(135deg,#fff4d8,#eef6ff_58%,#eafaf1)] p-5 md:p-8">
+        <div className="border-bw-border rounded-[2.25rem] border bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.05)] md:p-8">
           <div className="border-bw-border grid gap-8 rounded-[1.75rem] border bg-white p-6 md:p-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
             <Reveal>
               <p className="text-bw-green text-sm font-black">Trust and disclosure</p>
@@ -1004,7 +885,7 @@ export function HomeExperience() {
                 return (
                   <Reveal key={item.label}>
                     <div className="border-bw-border bg-bw-paper flex items-center gap-4 rounded-full border p-4">
-                      <span className="bg-bw-green-soft flex size-11 shrink-0 items-center justify-center rounded-full">
+                      <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white">
                         <Icon className="text-bw-green size-5" />
                       </span>
                       <p className="text-bw-ink leading-6 font-bold">{item.label}</p>
@@ -1027,6 +908,6 @@ export function HomeExperience() {
   );
 }
 
-function shortHeroScore(label: string) {
-  return label.replace("Review Trust Score", "Trust").replace(" Score", "");
+function shortHeroVerdict(verdict: Verdict) {
+  return verdict === "Better Alternative Available" ? "Better alternative" : verdict;
 }

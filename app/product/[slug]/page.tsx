@@ -73,7 +73,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         >
           <Link href="/">
             <ArrowLeft className="mr-2 size-4" />
-            Back to checker
+            Back home
           </Link>
         </Button>
 
@@ -131,7 +131,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 />
               </div>
 
-              <p className="border-bw-border bg-bw-green-soft text-bw-muted mt-5 rounded-[1.5rem] border p-4 text-sm leading-6 font-medium">
+              <p className="border-bw-border bg-white text-bw-muted mt-5 rounded-[1.5rem] border p-4 text-sm leading-6 font-medium shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
                 We may earn a commission when you buy through some links. AI scores and
                 recommendations remain commission-neutral.
               </p>
@@ -175,6 +175,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   value={`+${formatPrice(priceAboveLow, product.currency)}`}
                 />
                 <MetricCard label="Retail discount" value={discount ? `${discount}%` : "N/A"} />
+                <MetricCard
+                  label="Health/Safety"
+                  value={product.category === "Beauty" ? "Review needed" : "N/A"}
+                />
               </div>
 
               <div className="border-bw-border bg-bw-paper rounded-[1.5rem] border p-5">
@@ -283,7 +287,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <section className="border-bw-border mt-5 rounded-[2rem] border bg-white p-6 shadow-[0_10px_30px_rgba(44,37,24,0.06)] md:p-8">
             <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
               <div>
-                <Badge className="border-bw-green/20 bg-bw-green-soft text-bw-green rounded-full border px-4 py-2">
+                  <Badge className="border-bw-border bg-white text-bw-green rounded-full border px-4 py-2">
                   Better alternative found
                 </Badge>
                 <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -318,7 +322,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 </ul>
               </div>
 
-              <div className="border-bw-border bg-bw-fog rounded-[1.75rem] border p-6 text-center">
+              <div className="border-bw-border bg-white rounded-[1.75rem] border p-6 text-center">
                 {alternativeTheme ? (
                   <span
                     className={cn(
@@ -398,7 +402,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
             <Separator className="my-6" />
 
-            <div className="bg-bw-blue-soft flex gap-3 rounded-[1.5rem] p-4">
+            <div className="border-bw-border flex gap-3 rounded-[1.5rem] border bg-white p-4">
               <Sparkles className="text-primary mt-0.5 size-5 shrink-0" />
               <p className="text-bw-muted text-sm leading-6 font-medium">
                 Source cards are demo-grade in Phase 1, but they show how evidence will be grouped.
@@ -445,12 +449,7 @@ function InsightList({
   const positive = icon === "pro";
 
   return (
-    <div
-      className={cn(
-        "rounded-[1.5rem] border p-4",
-        positive ? "border-bw-green/20 bg-bw-green-soft" : "border-bw-amber/25 bg-bw-amber-soft"
-      )}
-    >
+    <div className="border-bw-border rounded-[1.5rem] border bg-white p-4">
       <p className="font-display text-bw-ink text-xl font-black">{title}</p>
       <div className="mt-4 space-y-3">
         {items.map((item) => (

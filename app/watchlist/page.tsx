@@ -1,44 +1,69 @@
-import { BookmarkPlus, Bell, Sparkles } from "lucide-react";
-import { StagedRouteShell } from "@/components/shared/staged-route-shell";
+import Link from "next/link";
+import { ArrowRight, Bell, Trash2 } from "lucide-react";
+import {
+  AppPageShell,
+  LoginGateCard,
+  ProductCard,
+  SectionHeader,
+  TrustNotice,
+} from "@/components/shared/buywise-ui";
+import { Button } from "@/components/ui/button";
+import { savedProducts } from "@/lib/buywise-demo-data";
 
 export default function WatchlistPage() {
   return (
-    <StagedRouteShell
+    <AppPageShell
       eyebrow="Saved products"
-      title="Watchlist is staged for signed-in users."
-      description="Basic product checks stay open. Watchlists are the first saved-product surface, so this route is intentionally positioned behind login once auth is connected."
-      primaryHref="/product/sony-wh-1000xm5"
-      primaryLabel="Open demo report"
-      secondaryHref="/"
-      secondaryLabel="Back home"
-      note="This is where saved products, follow-up comparisons, and revisit history will live."
+      title="Watch products when timing, price, or alternatives are still moving."
+      description="Watchlists are staged as a signed-in surface. The UI shows saved products, price movement, verdict changes, alert state, and better-alternative notifications."
+      actions={
+        <Button asChild className="h-12 rounded-full px-5 font-black">
+          <Link href="/alerts">
+            Price alerts
+            <ArrowRight className="ml-2 size-4" />
+          </Link>
+        </Button>
+      }
     >
-      <div className="grid gap-3">
-        <div className="rounded-xl border border-bw-border bg-white p-5">
-          <BookmarkPlus className="size-5 text-primary" />
-          <p className="mt-4 font-semibold text-bw-ink">Save products worth revisiting</p>
-          <p className="mt-2 text-sm font-medium leading-6 text-bw-muted">
-            Hold products when the verdict is close, the price is high, or the alternative needs a
-            second look.
-          </p>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-xl border border-bw-border bg-white p-5">
-            <Bell className="size-5 text-bw-green" />
-            <p className="mt-4 font-semibold text-bw-ink">Alert handoff</p>
-            <p className="mt-2 text-sm font-medium leading-6 text-bw-muted">
-              Watchlists will flow into price alerts once authentication is live.
-            </p>
+      <div className="grid gap-5 lg:grid-cols-[1fr_22rem]">
+        <section>
+          <SectionHeader
+            eyebrow="Watchlist"
+            title="Saved products with active buying signals."
+            description="Demo state only: persistence starts after auth is connected."
+          />
+          <div className="mt-8 grid gap-4 xl:grid-cols-2">
+            {savedProducts.map((item) => (
+              <div key={item.product.slug} className="space-y-3">
+                <ProductCard product={item.product} actionLabel="Open saved report" />
+                <div className="border-bw-border grid gap-3 rounded-[1.5rem] border bg-white p-4 text-sm font-bold text-bw-muted sm:grid-cols-3">
+                  <span>{item.movement}</span>
+                  <span className="text-primary">{item.alertStatus}</span>
+                  <span>{item.note}</span>
+                </div>
+                <div className="flex gap-2">
+                  <Button className="h-10 rounded-full px-4 font-black" variant="outline">
+                    <Bell className="mr-2 size-4" />
+                    Edit alert
+                  </Button>
+                  <Button className="h-10 rounded-full px-4 font-black" variant="outline">
+                    <Trash2 className="mr-2 size-4" />
+                    Remove
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="rounded-xl border border-bw-border bg-white p-5">
-            <Sparkles className="size-5 text-bw-violet" />
-            <p className="mt-4 font-semibold text-bw-ink">Personalization surface</p>
-            <p className="mt-2 text-sm font-medium leading-6 text-bw-muted">
-              Saved items are the foundation for personal recommendations later.
-            </p>
-          </div>
-        </div>
+        </section>
+
+        <aside className="space-y-4">
+          <LoginGateCard
+            title="Login required to persist watchlists"
+            description="Basic checks remain open, but saved products need an account so BuyWise can retain alerts and history."
+          />
+          <TrustNotice />
+        </aside>
       </div>
-    </StagedRouteShell>
+    </AppPageShell>
   );
 }

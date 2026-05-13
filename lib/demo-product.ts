@@ -134,8 +134,7 @@ export const productCatalog: ProductVerdict[] = [
     name: "Apple iPhone 15 Pro",
     brand: "Apple",
     category: "Smartphones",
-    imageUrl:
-      "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=1200&q=80",
+    imageUrl: "/images/products/iphone-17-pro-orange-white-bg.png",
     retailer: "Best Buy",
     retailerUrl: "https://www.bestbuy.com/site/searchpage.jsp?st=iphone+15+pro",
     currentPrice: 899,

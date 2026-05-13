@@ -65,8 +65,8 @@ export function PriceAlertDialog({
         data-lenis-prevent
       >
         <DialogHeader>
-          <div className="border-bw-border border-b bg-[linear-gradient(135deg,#fff4d8,#eef6ff_52%,#eafaf1)] px-6 py-6">
-            <Badge className="text-primary mb-3 w-fit rounded-2xl border border-white/80 bg-white/82 px-4 py-2 shadow-sm">
+          <div className="border-bw-border border-b bg-white px-6 py-6">
+            <Badge className="text-primary mb-3 w-fit rounded-2xl border border-bw-border bg-bw-paper px-4 py-2 shadow-sm">
               Login required to save alerts
             </Badge>
             <DialogTitle className="font-display text-bw-ink text-2xl font-black">
@@ -119,7 +119,7 @@ export function PriceAlertDialog({
 
           <Separator />
 
-          <div className="bg-bw-green-soft text-bw-muted flex items-start gap-3 rounded-[1.5rem] p-4 text-sm">
+          <div className="border-bw-border text-bw-muted flex items-start gap-3 rounded-[1.5rem] border bg-white p-4 text-sm">
             <ShieldCheck className="text-bw-green mt-0.5 size-5 shrink-0" />
             <p>
               We may earn a commission from some links. AI scores and recommendations are not based
@@ -129,7 +129,7 @@ export function PriceAlertDialog({
 
           <DialogFooter className="-mx-0 -mb-0 border-0 bg-transparent p-0">
             <Button
-              className="text-primary-foreground h-12 w-full rounded-2xl bg-[linear-gradient(135deg,var(--bw-ink),var(--bw-blue)_58%,var(--bw-green))]"
+              className="text-primary-foreground h-12 w-full rounded-2xl bg-primary"
               type="submit"
             >
               Continue to login
