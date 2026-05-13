@@ -579,11 +579,11 @@ export function HomeExperience() {
             return (
               <motion.article
                 key={product.slug}
-                className="border-bw-border overflow-hidden rounded-[2rem] border bg-white shadow-[0_10px_30px_rgba(15,23,42,0.05)]"
+                className="border-bw-border flex flex-col overflow-hidden rounded-[2rem] border bg-white shadow-[0_10px_30px_rgba(15,23,42,0.05)] md:h-full"
                 transition={spring}
                 whileHover={shouldReduceMotion ? undefined : { y: -5 }}
               >
-                <div className="bg-bw-fog h-56">
+                <div className="bg-bw-fog h-56 shrink-0">
                   <Image
                     alt={product.name}
                     className="h-full w-full object-cover"
@@ -593,7 +593,7 @@ export function HomeExperience() {
                     width={640}
                   />
                 </div>
-                <div className="p-5">
+                <div className="flex flex-col p-5 md:flex-1">
                   <span
                     className={cn(
                       "inline-flex rounded-full px-3 py-1 text-xs font-black",
@@ -602,16 +602,16 @@ export function HomeExperience() {
                   >
                     {product.verdict}
                   </span>
-                  <h3 className="font-display text-bw-ink mt-4 text-2xl leading-tight font-black">
+                  <h3 className="font-display text-bw-ink mt-4 line-clamp-3 min-h-[3.6rem] text-2xl leading-tight font-black md:min-h-[5.4rem]">
                     {product.name}
                   </h3>
-                  <div className="text-bw-muted mt-3 flex items-center gap-2 text-sm font-bold">
+                  <div className="text-bw-muted mt-3 flex h-5 items-center gap-2 text-sm font-bold">
                     <Star className="text-bw-amber size-4 fill-current" />
                     {product.reviewRating} rating -{" "}
                     {formatPrice(product.currentPrice, product.currency)}
                   </div>
                   <Link
-                    className="bg-primary mt-5 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-black text-white shadow-[0_10px_24px_rgba(40,103,232,0.18)] transition hover:-translate-y-0.5 hover:bg-primary/90"
+                    className="bg-primary mt-5 inline-flex w-fit items-center gap-2 rounded-full px-4 py-2 text-sm font-black text-white shadow-[0_10px_24px_rgba(40,103,232,0.18)] transition hover:-translate-y-0.5 hover:bg-primary/90 md:mt-auto"
                     href={`/product/${product.slug}`}
                   >
                     Open analytics
