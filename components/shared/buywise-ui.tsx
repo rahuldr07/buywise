@@ -210,8 +210,8 @@ export function ProductCard({
   const trustScore = product.scores.find((score) => score.id === "trust")?.score ?? product.confidenceScore;
 
   return (
-    <article className="border-bw-border overflow-hidden rounded-[2rem] border bg-white shadow-[0_14px_40px_rgba(15,23,42,0.055)]">
-      <div className="relative h-56 bg-white">
+    <article className="border-bw-border flex h-full min-h-[35rem] flex-col overflow-hidden rounded-[2rem] border bg-white shadow-[0_14px_40px_rgba(15,23,42,0.055)]">
+      <div className="relative h-56 shrink-0 bg-white">
         {compare ? (
           <label className="absolute top-4 left-4 z-10 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-2 text-xs font-black text-bw-ink shadow-sm backdrop-blur">
             <input
@@ -231,22 +231,22 @@ export function ProductCard({
           width={680}
         />
       </div>
-      <div className="p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-1 flex-col p-5">
+        <div className="flex h-9 items-center justify-between gap-3">
           <VerdictBadge verdict={product.verdict} />
           <span className="font-display text-3xl font-black text-bw-ink">{product.aiBuyScore}</span>
         </div>
-        <h3 className="font-display mt-4 line-clamp-2 text-2xl leading-tight font-black text-bw-ink">
+        <h3 className="font-display mt-4 line-clamp-2 min-h-[4rem] text-2xl leading-tight font-black text-bw-ink">
           {product.name}
         </h3>
-        <p className="mt-2 text-sm font-bold text-bw-muted">
+        <p className="mt-2 min-h-5 text-sm font-bold text-bw-muted">
           {product.retailer} availability - {formatPrice(product.currentPrice, product.currency)}
         </p>
         <div className="mt-4 grid grid-cols-2 gap-2">
           <MiniMetric label="Review trust" value={trustScore} />
           <MiniMetric label="Price score" value={priceScore} />
         </div>
-        <Button asChild className="mt-5 h-11 w-full rounded-full font-black">
+        <Button asChild className="mt-auto h-11 w-full rounded-full font-black">
           <Link href={`/product/${product.slug}`}>
             {actionLabel}
             <ArrowRight className="ml-2 size-4" />
