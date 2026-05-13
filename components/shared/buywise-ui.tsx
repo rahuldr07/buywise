@@ -13,23 +13,12 @@ import {
   Sparkles,
 } from "lucide-react";
 import { PageMotion } from "@/components/shared/page-motion";
+import { WebAppHeader } from "@/components/shared/web-app-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { verdictTheme } from "@/lib/verdict-theme";
 import { cn, formatNumber, formatPrice } from "@/lib/utils";
 import type { ProductVerdict, Verdict } from "@/types/product";
-
-type ShellLink = {
-  href: string;
-  label: string;
-};
-
-const shellLinks: ShellLink[] = [
-  { href: "/search", label: "Search" },
-  { href: "/deals", label: "Deals" },
-  { href: "/compare", label: "Compare" },
-  { href: "/chat", label: "AI chat" },
-];
 
 const journeySteps = [
   {
@@ -70,27 +59,7 @@ export function AppPageShell({
   return (
     <PageMotion>
       <div className="mx-auto max-w-7xl">
-        <header
-          data-page-nav
-          className="border-bw-border sticky top-4 z-40 flex items-center justify-between gap-3 rounded-full border bg-white/94 px-4 py-3 shadow-[0_16px_44px_rgba(15,23,42,0.08)] backdrop-blur-xl"
-        >
-          <Link className="flex items-center gap-3" href="/">
-            <span className="bg-bw-amber text-bw-ink flex size-10 items-center justify-center rounded-full">
-              <Sparkles className="size-4" />
-            </span>
-            <span className="font-display text-lg font-black tracking-[-0.04em]">IsItABuy</span>
-          </Link>
-          <nav className="hidden items-center gap-5 text-sm font-black text-bw-ink md:flex">
-            {shellLinks.map((link) => (
-              <Link key={link.href} className="transition hover:text-primary" href={link.href}>
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-          <Button asChild className="h-11 rounded-full px-5 text-sm font-black">
-            <Link href="/account">Sign in</Link>
-          </Button>
-        </header>
+        <WebAppHeader />
 
         <section
           data-page-hero
