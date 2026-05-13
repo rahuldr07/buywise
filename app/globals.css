@@ -8,37 +8,37 @@
 :root {
   --radius: 1.5rem;
 
-  --bw-paper: #faf7ef;
+  --bw-paper: #fbf6ea;
   --bw-surface: #ffffff;
-  --bw-surface-raised: #f8fafc;
-  --bw-ink: #0f172a;
-  --bw-muted: #64748b;
-  --bw-border: #e5e7eb;
-  --bw-fog: #f8fafc;
+  --bw-surface-raised: #f6f8f5;
+  --bw-ink: #12201a;
+  --bw-muted: #66716b;
+  --bw-border: #e6decf;
+  --bw-fog: #f5f1e8;
 
-  --bw-blue: #2563eb;
-  --bw-green: #10b981;
-  --bw-amber: #f59e0b;
-  --bw-red: #ef4444;
-  --bw-violet: #6d5dfb;
-  --bw-coral: #f26b4f;
-  --bw-mint: #8ee7bd;
+  --bw-blue: #2f6fda;
+  --bw-green: #22a66a;
+  --bw-amber: #f0a018;
+  --bw-red: #d94f45;
+  --bw-violet: #6f63d9;
+  --bw-coral: #df7353;
+  --bw-mint: #bceccf;
 
-  --bw-blue-soft: #eff6ff;
-  --bw-green-soft: #ecfdf5;
-  --bw-amber-soft: #fffbeb;
-  --bw-red-soft: #fef2f2;
-  --bw-violet-soft: #f5f3ff;
-  --bw-coral-soft: #fff0ea;
+  --bw-blue-soft: #edf5ff;
+  --bw-green-soft: #eaf8ef;
+  --bw-amber-soft: #fff4cf;
+  --bw-red-soft: #fff0ed;
+  --bw-violet-soft: #f2efff;
+  --bw-coral-soft: #fff0e8;
 
   --bw-gradient-hero:
-    radial-gradient(circle at 16% 8%, rgba(37, 99, 235, 0.1), transparent 24rem),
-    linear-gradient(135deg, #faf7ef 0%, #ffffff 58%, #f8fafc 100%);
+    radial-gradient(circle at 16% 8%, rgba(47, 111, 218, 0.1), transparent 24rem),
+    linear-gradient(135deg, #fbf6ea 0%, #ffffff 58%, #f6f8f5 100%);
   --bw-gradient-card: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.92));
-  --bw-gradient-primary: linear-gradient(135deg, #0f172a 0%, #2563eb 100%);
-  --bw-gradient-warm: linear-gradient(135deg, #ffffff 0%, #faf7ef 56%, #f8fafc 100%);
-  --bw-shadow-soft: 0 12px 34px rgba(15, 23, 42, 0.06);
-  --bw-shadow-strong: 0 20px 70px rgba(15, 23, 42, 0.1);
+  --bw-gradient-primary: linear-gradient(135deg, #234f9e 0%, #2f6fda 100%);
+  --bw-gradient-warm: linear-gradient(135deg, #ffffff 0%, #fbf6ea 56%, #f6f8f5 100%);
+  --bw-shadow-soft: 0 12px 34px rgba(33, 32, 24, 0.06);
+  --bw-shadow-strong: 0 20px 70px rgba(33, 32, 24, 0.1);
 
   --background: var(--bw-paper);
   --foreground: var(--bw-ink);
@@ -183,13 +183,15 @@ html {
 body {
   min-height: 100vh;
   background:
-    linear-gradient(rgba(15, 23, 42, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.028) 1px, transparent 1px),
-    radial-gradient(circle at 8% 0%, rgba(37, 99, 235, 0.08), transparent 26rem),
-    linear-gradient(180deg, #faf7ef 0%, #fffdf8 58%, #f8fafc 100%);
+    linear-gradient(rgba(18, 32, 26, 0.034) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 32, 26, 0.034) 1px, transparent 1px),
+    radial-gradient(circle at 8% 0%, rgba(240, 160, 24, 0.14), transparent 28rem),
+    radial-gradient(circle at 92% 12%, rgba(47, 111, 218, 0.08), transparent 26rem),
+    linear-gradient(180deg, #fbf6ea 0%, #fffdf8 58%, #f6f8f5 100%);
   background-size:
     64px 64px,
     64px 64px,
+    auto,
     auto,
     auto;
   color: var(--foreground);

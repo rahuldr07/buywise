@@ -77,7 +77,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </Link>
         </Button>
 
-        <section className="border-bw-border rounded-[2rem] border bg-white p-5 shadow-[0_12px_36px_rgba(44,37,24,0.08)] md:p-7">
+        <section className="border-bw-border overflow-hidden rounded-[2.5rem] border bg-[linear-gradient(135deg,#ffffff_0%,#fff8e7_46%,#eff7ff_100%)] p-5 shadow-[0_20px_70px_rgba(44,37,24,0.1)] md:p-7">
           <div className="grid gap-7 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
             <div>
               <div className="flex flex-wrap items-center gap-3">
@@ -117,7 +117,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </p>
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Button asChild className="bg-bw-ink h-[3.25rem] rounded-full px-6 text-white">
+                <Button asChild className="bg-primary h-[3.25rem] rounded-full px-6 text-white shadow-[0_12px_28px_rgba(40,103,232,0.2)]">
                   <a href={product.retailerUrl} rel="noreferrer" target="_blank">
                     View retailer
                     <ExternalLink className="ml-2 size-4" />
@@ -138,7 +138,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </div>
 
             <div className="grid gap-4">
-              <div className="border-bw-border bg-bw-fog rounded-[1.75rem] border p-5">
+              <div className="border-bw-border bg-white/78 rounded-[1.75rem] border p-5 shadow-[0_14px_40px_rgba(15,23,42,0.05)]">
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-bw-muted text-sm font-black">Executive score</p>
@@ -181,7 +181,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 />
               </div>
 
-              <div className="border-bw-border bg-bw-paper rounded-[1.5rem] border p-5">
+              <div className="border-bw-border bg-white/78 rounded-[1.5rem] border p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <p className="text-primary text-sm font-black">Decision summary</p>
@@ -201,10 +201,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                         <span className="text-bw-ink">{score.score}</span>
                       </div>
                       <div className="bg-bw-border/80 mt-2 h-1.5 overflow-hidden rounded-full">
-                        <div
-                          className="bg-bw-ink h-full rounded-full"
-                          style={{ width: `${score.score}%` }}
-                        />
+                          <div className="bg-primary h-full rounded-full" style={{ width: `${score.score}%` }} />
                       </div>
                     </div>
                   ))}

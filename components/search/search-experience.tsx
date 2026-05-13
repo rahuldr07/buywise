@@ -2,9 +2,16 @@
 
 import type { ReactNode } from "react";
 import { useDeferredValue, useState } from "react";
-import { ArrowDownUp, Clock, Search } from "lucide-react";
+import Link from "next/link";
+import { ArrowDownUp, Clock, GitCompareArrows, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AppPageShell, FilterRail, ProductCard, TrustNotice } from "@/components/shared/buywise-ui";
+import {
+  AppPageShell,
+  EmptyState,
+  FilterRail,
+  ProductCard,
+  TrustNotice,
+} from "@/components/shared/buywise-ui";
 import { productCatalog } from "@/lib/demo-product";
 import { searchFacets } from "@/lib/buywise-demo-data";
 import { cn } from "@/lib/utils";
@@ -14,16 +21,15 @@ export function SearchExperience({ initialQuery = "" }: { initialQuery?: string 
   const [category, setCategory] = useState("All");
   const [retailer, setRetailer] = useState("All");
   const [sort, setSort] = useState("Best value");
+  const [selectedCompare, setSelectedCompare] = useState<string[]>([]);
   const deferredQuery = useDeferredValue(query);
-  const normalizedQuery = deferredQuery.trim().toLowerCase();
+  const normalizedQuery = normalizeSearch(deferredQuery);
 
   const results = productCatalog
     .filter((product) => {
       const matchesQuery =
         !normalizedQuery ||
-        `${product.name} ${product.brand} ${product.category} ${product.retailer}`
-          .toLowerCase()
-          .includes(normalizedQuery);
+        fuzzyScore(normalizedQuery, `${product.name} ${product.brand} ${product.category} ${product.retailer}`) > 0;
       const matchesCategory = category === "All" || product.category === category;
       const matchesRetailer = retailer === "All" || product.retailer === retailer;
 
@@ -35,6 +41,16 @@ export function SearchExperience({ initialQuery = "" }: { initialQuery?: string 
       if (sort === "Highest AI score") return b.aiBuyScore - a.aiBuyScore;
       return b.aiBuyScore + b.confidenceScore - (a.aiBuyScore + a.confidenceScore);
     });
+
+  const compareHref =
+    selectedCompare.length > 0 ? `/compare/${selectedCompare[0]}` : "/compare";
+
+  function toggleCompare(slug: string, selected: boolean) {
+    setSelectedCompare((current) => {
+      if (!selected) return current.filter((item) => item !== slug);
+      return [...new Set([...current, slug])].slice(0, 3);
+    });
+  }
 
   return (
     <AppPageShell
@@ -98,6 +114,27 @@ export function SearchExperience({ initialQuery = "" }: { initialQuery?: string 
 
           <TrustNotice>Search and product verdicts stay free. Saved products, alerts, receipts, and personalization require login later.</TrustNotice>
 
+          {selectedCompare.length > 0 ? (
+            <div className="border-bw-border flex flex-col gap-3 rounded-[1.5rem] border bg-white p-4 shadow-[0_10px_30px_rgba(15,23,42,0.04)] sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <span className="bg-bw-blue-soft text-primary flex size-11 items-center justify-center rounded-full">
+                  <GitCompareArrows className="size-5" />
+                </span>
+                <div>
+                  <p className="font-display text-bw-ink text-xl font-black">
+                    {selectedCompare.length} selected for compare
+                  </p>
+                  <p className="text-bw-muted text-sm font-medium">
+                    Select up to 3 products, then open the comparison flow.
+                  </p>
+                </div>
+              </div>
+              <Button asChild className="h-11 rounded-full px-5 font-black">
+                <Link href={compareHref}>Compare selected</Link>
+              </Button>
+            </div>
+          ) : null}
+
           <div id="results" className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-black text-primary">Results</p>
@@ -110,15 +147,58 @@ export function SearchExperience({ initialQuery = "" }: { initialQuery?: string 
             </p>
           </div>
 
-          <div className="grid gap-4 xl:grid-cols-2">
-            {results.map((product) => (
-              <ProductCard key={product.slug} compare product={product} />
-            ))}
-          </div>
+          {results.length > 0 ? (
+            <div className="grid gap-4 xl:grid-cols-2">
+              {results.map((product) => (
+                <ProductCard
+                  key={product.slug}
+                  compare
+                  compareSelected={selectedCompare.includes(product.slug)}
+                  onCompareChange={(selected) => toggleCompare(product.slug, selected)}
+                  product={product}
+                />
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              actionHref="/"
+              actionLabel="Start from homepage"
+              description="Try a broader term like iPhone, Sony, Nike, headphones, phones, or shoes."
+              title="No products matched this search"
+            />
+          )}
         </section>
       </div>
     </AppPageShell>
   );
+}
+
+function normalizeSearch(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function fuzzyScore(query: string, value: string) {
+  const haystack = normalizeSearch(value);
+  const tokens = query.split(" ").filter(Boolean);
+
+  if (tokens.length === 0) return 1;
+
+  return tokens.reduce((score, token) => {
+    if (haystack.includes(token)) return score + token.length * 6;
+    if (isSubsequence(token, haystack)) return score + token.length;
+    return score;
+  }, 0);
+}
+
+function isSubsequence(needle: string, haystack: string) {
+  let cursor = 0;
+
+  for (const char of haystack) {
+    if (char === needle[cursor]) cursor += 1;
+    if (cursor === needle.length) return true;
+  }
+
+  return false;
 }
 
 function FilterPicker({

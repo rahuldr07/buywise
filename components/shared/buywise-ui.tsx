@@ -5,11 +5,14 @@ import {
   ArrowRight,
   BadgeCheck,
   Bell,
+  GitCompareArrows,
   LockKeyhole,
+  Radar,
   Search,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import { PageMotion } from "@/components/shared/page-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { verdictTheme } from "@/lib/verdict-theme";
@@ -28,6 +31,29 @@ const shellLinks: ShellLink[] = [
   { href: "/chat", label: "AI chat" },
 ];
 
+const journeySteps = [
+  {
+    icon: Search,
+    label: "Find",
+    copy: "Paste, search, scan, or start from a product card.",
+  },
+  {
+    icon: Radar,
+    label: "Score",
+    copy: "Price, reviews, trust, and alternatives are ranked together.",
+  },
+  {
+    icon: GitCompareArrows,
+    label: "Compare",
+    copy: "Open the cleaner option when the evidence supports it.",
+  },
+  {
+    icon: Bell,
+    label: "Save",
+    copy: "Login only for watchlists, alerts, receipts, and history.",
+  },
+] as const;
+
 export function AppPageShell({
   eyebrow,
   title,
@@ -42,12 +68,15 @@ export function AppPageShell({
   actions?: ReactNode;
 }) {
   return (
-    <main className="min-h-screen px-4 py-5">
+    <PageMotion>
       <div className="mx-auto max-w-7xl">
-        <header className="border-bw-border sticky top-4 z-40 flex items-center justify-between gap-3 rounded-full border bg-white/94 px-4 py-3 shadow-[0_16px_44px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+        <header
+          data-page-nav
+          className="border-bw-border sticky top-4 z-40 flex items-center justify-between gap-3 rounded-full border bg-white/94 px-4 py-3 shadow-[0_16px_44px_rgba(15,23,42,0.08)] backdrop-blur-xl"
+        >
           <Link className="flex items-center gap-3" href="/">
-            <span className="bg-primary flex size-10 items-center justify-center rounded-full text-white">
-              <Sparkles className="size-4 fill-current" />
+            <span className="bg-bw-amber text-bw-ink flex size-10 items-center justify-center rounded-full">
+              <Sparkles className="size-4" />
             </span>
             <span className="font-display text-lg font-black tracking-[-0.04em]">IsItABuy</span>
           </Link>
@@ -63,7 +92,10 @@ export function AppPageShell({
           </Button>
         </header>
 
-        <section className="border-bw-border mt-6 overflow-hidden rounded-[2.75rem] border bg-white/88 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur md:p-8">
+        <section
+          data-page-hero
+          className="border-bw-border mt-6 overflow-hidden rounded-[2.75rem] border bg-[linear-gradient(135deg,#ffffff_0%,#fff8e7_46%,#eff7ff_100%)] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur md:p-8"
+        >
           <Badge className="border-bw-border bg-bw-paper text-bw-muted rounded-full border px-4 py-2">
             {eyebrow}
           </Badge>
@@ -78,11 +110,40 @@ export function AppPageShell({
             </div>
             {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
           </div>
+
+          <div className="mt-7 grid gap-3 md:grid-cols-4">
+            {journeySteps.map((step, index) => {
+              const Icon = step.icon;
+
+              return (
+                <div
+                  key={step.label}
+                  data-flow-card
+                  className="border-bw-border bg-white/78 rounded-[1.5rem] border p-4 shadow-[0_10px_30px_rgba(15,23,42,0.04)]"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="bg-bw-amber-soft text-bw-amber flex size-10 items-center justify-center rounded-full">
+                      <Icon className="size-4" />
+                    </span>
+                    <div>
+                      <p className="text-bw-muted text-[0.68rem] font-black tracking-[0.16em] uppercase">
+                        Step {index + 1}
+                      </p>
+                      <p className="font-display text-bw-ink text-lg font-black">{step.label}</p>
+                    </div>
+                  </div>
+                  <p className="text-bw-muted mt-3 text-sm leading-6 font-medium">{step.copy}</p>
+                </div>
+              );
+            })}
+          </div>
         </section>
 
-        <div className="py-6">{children}</div>
+        <div data-page-content className="py-6">
+          {children}
+        </div>
       </div>
-    </main>
+    </PageMotion>
   );
 }
 
@@ -166,10 +227,14 @@ export function ScoreTile({
 export function ProductCard({
   product,
   compare = false,
+  compareSelected = false,
+  onCompareChange,
   actionLabel = "View AI analysis",
 }: {
   product: ProductVerdict;
   compare?: boolean;
+  compareSelected?: boolean;
+  onCompareChange?: (selected: boolean) => void;
   actionLabel?: string;
 }) {
   const priceScore = product.scores.find((score) => score.id === "price")?.score ?? product.aiBuyScore;
@@ -180,7 +245,12 @@ export function ProductCard({
       <div className="relative h-56 bg-white">
         {compare ? (
           <label className="absolute top-4 left-4 z-10 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-2 text-xs font-black text-bw-ink shadow-sm backdrop-blur">
-            <input className="accent-bw-blue" type="checkbox" />
+            <input
+              checked={compareSelected}
+              className="accent-bw-blue"
+              onChange={(event) => onCompareChange?.(event.target.checked)}
+              type="checkbox"
+            />
             Compare
           </label>
         ) : null}
